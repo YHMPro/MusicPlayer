@@ -25,6 +25,14 @@ namespace MusicPlayer
         /// </summary>
         private LrcInfo m_LrcInfo;
         /// <summary>
+        /// 是否有歌词
+        /// </summary>
+        private bool m_IsHaveLrc;
+        /// <summary>
+        /// 是否有封面
+        /// </summary>
+        private bool m_IsHaveCover;
+        /// <summary>
         /// 歌曲音频
         /// </summary>
         public AudioClip Ac
@@ -63,21 +71,24 @@ namespace MusicPlayer
         /// <param name="progressCallback">加载进度回调</param>
         public void InitMusicData(string musicUrl,string lrcUrl,UnityAction<MusicData> resultCallback,UnityAction <float> progressCallback=null)
         {
+            //if(musicUrl==null|| musicUrl)
             DownLoad.DownLoadAudioClipAsset(musicUrl, (ac) =>
              {
                   Debug.Log("歌曲音频加载成功");
                   m_Ac = ac;//音频                  
                   LrcInfo.GetLrc(lrcUrl, (lrcInfo) =>
                   {
-                      GetAlbumCover(musicUrl, (cover) =>
-                      {
-                          Debug.Log("歌曲封面加载成功");
-                          m_Cover = cover;
-                      });//封面
                       Debug.Log("歌曲歌词加载成功");
                       m_LrcInfo = lrcInfo;//歌词信息
-                      resultCallback?.Invoke(this);
-                  });              
+                      m_IsHaveLrc = true;                                                                       
+                  });
+                 GetAlbumCover(musicUrl, (cover) =>
+                 {
+                     Debug.Log("歌曲封面加载成功");
+                     m_Cover = cover;
+                     m_IsHaveCover = true;
+                 });//封面       
+                 resultCallback?.Invoke(this);
              },progressCallback);
         }
         /// <summary>

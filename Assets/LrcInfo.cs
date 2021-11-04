@@ -45,40 +45,43 @@ namespace MusicPlayer
         {      
             DownLoad.DownLoadTextAsset(lrcURL, (lrcContent) =>
             {
-                 LrcInfo lrc = new LrcInfo();
-                 string[] lrcContentLines = SplitString(lrcContent);//转换成一行对应一组数据
-                 foreach(string lrcContentLine in lrcContentLines)//遍历每一行的字符数据
-                 {
-                     if (lrcContentLine.StartsWith("[ti:"))
-                     {
-                         lrc.Title = SplitInfo(lrcContentLine);
-                     }
-                     else if (lrcContentLine.StartsWith("[ar:"))
-                     {
-                         lrc.Artist = SplitInfo(lrcContentLine);
-                     }
-                     else if (lrcContentLine.StartsWith("[al:"))
-                     {
-                         lrc.Album = SplitInfo(lrcContentLine);
-                     }
-                     else if (lrcContentLine.StartsWith("[by:"))
-                     {
-                         lrc.LrcBy = SplitInfo(lrcContentLine);
-                     }
-                     else if (lrcContentLine.StartsWith("[offset:"))
-                     {
-                         lrc.Offset = SplitInfo(lrcContentLine);
-                     }
-                     else
-                     {
-                         Regex regex = new Regex(@"\[([0-9.:]*)\]+(.*)", RegexOptions.Compiled);//正则表达式
-                         MatchCollection mc = regex.Matches(lrcContentLine);
-                         double time = TimeSpan.Parse("00:" + mc[0].Groups[1].Value).TotalSeconds;
-                         string word = mc[0].Groups[2].Value;
-                         lrc.LrcWord.Add(time, word);
-                     }
-                 }
-                 resultCallback?.Invoke(lrc);
+                LrcInfo lrc = new LrcInfo();//实例歌词信息
+                StringReader sr = new StringReader(lrcContent);//创建字符串读取工具实例
+                string[] lrcContentLines = SplitString(lrcContent);//转换成一行对应一组数据
+                string lrcLine;
+                while ((lrcLine=sr.ReadLine())!=null)
+                {
+                    if (lrcLine.StartsWith("[ti:"))
+                    {
+                        lrc.Title = SplitInfo(lrcLine);
+                    }
+                    else if (lrcLine.StartsWith("[ar:"))
+                    {
+                        lrc.Artist = SplitInfo(lrcLine);
+                    }
+                    else if (lrcLine.StartsWith("[al:"))
+                    {
+                        lrc.Album = SplitInfo(lrcLine);
+                    }
+                    else if (lrcLine.StartsWith("[by:"))
+                    {
+                        lrc.LrcBy = SplitInfo(lrcLine);
+                    }
+                    else if (lrcLine.StartsWith("[offset:"))
+                    {
+                        lrc.Offset = SplitInfo(lrcLine);
+                    }
+                    else
+                    {                       
+                        Regex regex = new Regex(@"\[([0-9.:]*)\]+(.*)", RegexOptions.Compiled);
+                        MatchCollection mc = regex.Matches(lrcLine);
+                        double time = TimeSpan.Parse("00:" + mc[0].Groups[1].Value).TotalSeconds;
+                        string word = mc[0].Groups[2].Value;
+                        lrc.LrcWord.Add(time, word);
+                    }
+                }              
+                sr.Close();
+                resultCallback?.Invoke(lrc);
              });                                     
         }
 

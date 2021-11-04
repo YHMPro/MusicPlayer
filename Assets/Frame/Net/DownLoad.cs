@@ -1,10 +1,8 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
-using NAudio.Wave;
 namespace Farme.Net
 {
     public class DownLoad
@@ -32,7 +30,7 @@ namespace Farme.Net
         private static IEnumerator IEDownLoadAudioClipAsset(string url, UnityAction<AudioClip> resultCallback, UnityAction<float> progressCallback = null)
         {          
             UnityWebRequest uwr = CreateWebRequest(url);//创建Web请求
-            DownloadHandlerAudioClip handle = new DownloadHandlerAudioClip(url, AudioType.UNKNOWN);//建立下载程序
+            DownloadHandlerAudioClip handle = new DownloadHandlerAudioClip(url, AudioType.UNKNOWN);//建立下载程序            
             uwr.downloadHandler = handle;//赋值
             UnityWebRequestAsyncOperation ao=uwr.SendWebRequest();//发送请求
             while (true)
@@ -65,18 +63,18 @@ namespace Farme.Net
         /// <param name="resultCallback">下载结果回调</param>
         /// <param name="progressCallback">下载进度回调</param>
         private static IEnumerator IEDownLoadTextAsset(string url, UnityAction<string> resultCallback, UnityAction<float> progressCallback=null)
-        {
+        {                      
             UnityWebRequest uwr = CreateWebRequest(url);//创建请求     
             UnityWebRequestAsyncOperation ao = uwr.SendWebRequest();//发送下载请求请求
             while (true)
-            {
+            {            
                 progressCallback?.Invoke(uwr.downloadProgress);//1.远程下载进度
                 if (uwr.isDone && uwr.downloadHandler.isDone)//1.与远程建立通信是否成功  2.给予远程的任务是否完成
                 { break;}
                 yield return uwr.downloadProgress;
-            }        
+            }
             progressCallback?.Invoke(1);//回调1
-            resultCallback?.Invoke(Encoding.GetEncoding(GB2312).GetString(uwr.downloadHandler.data));//回调下载结果
+            resultCallback?.Invoke(Encoding.GetEncoding(GB2312).GetString(uwr.downloadHandler.data));//回调下载结果         
         }
 
         /// <summary>
