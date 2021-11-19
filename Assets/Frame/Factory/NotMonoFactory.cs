@@ -17,7 +17,7 @@
         /// <summary>
         /// 获取实例
         /// </summary>      
-        /// <returns></returns>
+        /// <returns>实例</returns>
         public static T GetInstance()
         {
             return new T();

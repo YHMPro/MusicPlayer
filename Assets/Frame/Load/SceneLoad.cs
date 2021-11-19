@@ -2,9 +2,6 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-/// <summary>
-/// YHM工具
-/// </summary>
 namespace Farme
 {
     /// <summary>
@@ -41,7 +38,7 @@ namespace Farme
             while (!ao.isDone)//等待场景加载完成
             {
                 loadProgressCallback?.Invoke(ao.progress);
-                yield return 0;
+                yield return ao.progress;
             }
             //用于初始化数据
             endLoadCallback?.Invoke();

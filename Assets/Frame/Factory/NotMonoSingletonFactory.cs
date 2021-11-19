@@ -20,35 +20,35 @@
         /// <param name="result">结果</param>
         public static void GetSingleton(out T result)
         {
-            if (_instance == null)
+            if (m_Instance == null)
             {
-                lock (_threadLock)
+                lock (m_ThreadLock)
                 {
-                    if (_instance == null)
+                    if (m_Instance == null)
                     {
-                        NotMonoFactory<T>.GetInstance(out _instance);
+                        NotMonoFactory<T>.GetInstance(out m_Instance);
                     }
                 }
             }
-            result = _instance;
+            result = m_Instance;
         }
         /// <summary>
         /// 获取单例
         /// </summary>
-        /// <returns></returns>
+        /// <returns>实例</returns>
         public static T GetSingleton()
         {
-            if (_instance == null)
+            if (m_Instance == null)
             {
-                lock (_threadLock)
+                lock (m_ThreadLock)
                 {
-                    if (_instance == null)
+                    if (m_Instance == null)
                     {
-                        NotMonoFactory<T>.GetInstance(out _instance);
+                        NotMonoFactory<T>.GetInstance(out m_Instance);
                     }
                 }
             }
-            return _instance;
+            return m_Instance;
         }
         /// <summary>
         /// 清除单例

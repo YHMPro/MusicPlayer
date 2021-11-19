@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Debuger</name>
+    </assembly>
+    <members>
+        <member name="T:Farme.Tool.Debuger">
+            <summary>
+            调试工具
+            </summary>
+        </member>
+        <member name="F:Farme.Tool.Debuger.Enable">
+            <summary>
+            启用状态
+            </summary>
+        </member>
+        <member name="M:Farme.Tool.Debuger.Log(System.Object)">
+            <summary>
+            正常
+            </summary>
+            <param name="mesg">信息</param>
+        </member>
+        <member name="M:Farme.Tool.Debuger.LogWarning(System.Object)">
+            <summary>
+            警告
+            </summary>
+            <param name="mesg">信息</param>
+        </member>
+        <member name="M:Farme.Tool.Debuger.LogError(System.Object)">
+            <summary>
+            错误
+            </summary>
+            <param name="mesg">信息</param>
+        </member>
+    </members>
+</doc>

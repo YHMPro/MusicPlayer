@@ -165,13 +165,6 @@ namespace Farme
         /// <returns></returns>
         bool IsLoop();
     }
-    /// <summary>
-    /// 音效信息接口
-    /// </summary>
-    public interface IAudioInfo : IAudio
-    {
-        
-    }
     #endregion
 
     #region UGUI扩展接口

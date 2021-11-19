@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Farme.Tool;
 namespace Farme
 {    
     /// <summary>
@@ -23,29 +24,29 @@ namespace Farme
         /// <param name="isDontDestroyOnLoad">加载新场景时是否销毁目标对象</param>
         public static void GetSingleton(out T result, GameObject applyTarget = null, bool isDontDestroyOnLoad = true)
         {
-            if (_instance == null)
+            if (m_Instance == null)
             {
-                lock (_threadLock)
+                lock (m_ThreadLock)
                 {
-                    if (_instance == null)
+                    if (m_Instance == null)
                     {
                         T[] instances = FindSingletons();
                         if (instances.Length==0)
                         {
-                            MonoFactory<T>.GetInstance(out _instance, applyTarget, isDontDestroyOnLoad);
+                            MonoFactory<T>.GetInstance(out m_Instance, applyTarget, isDontDestroyOnLoad);
                         }
                         else
                         {
-                            _instance = instances[0];
+                            m_Instance = instances[0];
                             if (instances.Length > 1)
                             {
-                                Debug.LogWarning("场景内存在多个" + typeof(T).Name + "实例");
+                                Debuger.LogWarning("场景内存在多个" + typeof(T).Name + "实例");
                             }                            
                         }                      
                     }
                 }
             }
-            result = _instance;         
+            result = m_Instance;         
         }
         /// <summary>
         /// 获取单例
@@ -55,38 +56,38 @@ namespace Farme
         /// <returns></returns>
         public static T GetSingleton(GameObject applyTarget = null, bool isDontDestroyOnLoad = true)
         {
-            if (_instance == null)
+            if (m_Instance == null)
             {
-                lock (_threadLock)
+                lock (m_ThreadLock)
                 {
-                    if (_instance == null)
+                    if (m_Instance == null)
                     {
                         T[] instances = FindSingletons();
                         if (instances.Length == 0)
                         {
-                            _instance= MonoFactory<T>.GetInstance(applyTarget, isDontDestroyOnLoad);
+                            m_Instance = MonoFactory<T>.GetInstance(applyTarget, isDontDestroyOnLoad);
                         }
                         else
                         {
-                            _instance = instances[0];
+                            m_Instance = instances[0];
                             if (instances.Length > 1)
                             {
-                                Debug.LogWarning("场景内存在多个" + typeof(T).Name + "实例");
+                                Debuger.LogWarning("场景内存在多个" + typeof(T).Name + "实例");
                             }
                         }                       
                     }
                 }
             }
-            return _instance;
+            return m_Instance;
         }
         /// <summary>
         /// 清除单例
         /// </summary>
         public static void ClearSingleton()
         {
-            if (_instance != null)
+            if (m_Instance != null)
             {
-                Object.Destroy(_instance.gameObject);
+                Object.Destroy(m_Instance.gameObject);
             }
             ClearInstance();
         }

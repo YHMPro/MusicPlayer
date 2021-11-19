@@ -31,7 +31,7 @@ namespace Farme
         /// </summary>
         /// <param name="applyTarget">申请对象</param>
         /// <param name="isDontDestroyOnLoad">加载新场景时是否销毁目标对象</param>
-        /// <returns></returns>
+        /// <returns>实例</returns>
         public static T GetInstance(GameObject applyTarget = null, bool isDontDestroyOnLoad = true)
         {
             if (applyTarget == null)

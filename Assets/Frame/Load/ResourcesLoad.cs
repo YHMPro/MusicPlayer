@@ -4,7 +4,7 @@ using UnityEngine.Events;
 namespace Farme
 {
     /// <summary>
-    /// Res加载
+    /// Resources加载
     /// </summary>
     public class ResourcesLoad
     {
@@ -31,8 +31,7 @@ namespace Farme
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="resPath">资源路径</param>
-        /// <param name="result">结果</param>
-        /// <returns></returns>
+        /// <returns>结果</returns>
         public static T Load<T>(string resPath) where T : Object
         {
            return Resources.Load<T>(resPath);           

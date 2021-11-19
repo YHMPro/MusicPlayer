@@ -28,7 +28,6 @@ namespace Farme
         /// </summary>
         /// <param name="reuseGroup">复用组</param>
         /// <param name="result">结果</param>
-        /// <param name="parent">父级</param>
         /// <returns></returns>
         public static bool Take(string reuseGroup, out GameObject result)
         {
@@ -73,6 +72,7 @@ namespace Farme
         }
         /// <summary>
         /// 预热
+        /// 基于Resources加载预热
         /// </summary>
         /// <param name="goPath">go路径</param>
         /// <param name="reuseGroup">复用组</param>
@@ -83,6 +83,26 @@ namespace Farme
             while (total > 0)
             {
                 if (GoLoad.Take(goPath, out GameObject result, parent))
+                {
+                    Put(reuseGroup, result);
+                }
+                total--;
+            }
+        }
+        /// <summary>
+        /// 预热
+        /// 基于AssetsBundle加载预热
+        /// </summary>
+        /// <param name="abName">包名</param>
+        /// <param name="resName">资源名</param>
+        /// <param name="reuseGroup">复用组</param>
+        /// <param name="total">总数</param>
+        /// <param name="parent">父级</param>
+        public static void Preheat(string abName,string resName, string reuseGroup, int total, Transform parent = null)
+        {
+            while (total > 0)
+            {
+                if (GoLoad.Take(abName,resName,out GameObject result,parent))
                 {
                     Put(reuseGroup, result);
                 }
