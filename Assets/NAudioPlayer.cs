@@ -2,23 +2,25 @@
 using NAudio.Wave;
 using System;
 using System.IO;
-using System.Text;
 using UnityEngine;
+using UnityEngine.Events;
 public static class NAudioPlayer
 {
-    public static AudioClip FromMp3Data(byte[] data)
-    {
+    public static void FromMp3Data(byte[] data,UnityAction<AudioClip> callback)
+    {      
         // Load the data into a stream
-        MemoryStream mp3stream = new MemoryStream(data);
-        // Convert the data in the stream to WAV format
-        Mp3FileReader mp3audio = new Mp3FileReader(mp3stream);
-        WaveStream waveStream = WaveFormatConversionStream.CreatePcmStream(mp3audio);
-        // Convert to WAV data
-        WAV wav = new WAV(AudioMemStream(waveStream).ToArray());
-        AudioClip audioClip = AudioClip.Create("Music", wav.SampleCount, 1, wav.Frequency, false);
-        audioClip.SetData(wav.LeftChannel, 0);
-        // Return the clip
-        return audioClip;
+        using (MemoryStream mp3stream = new MemoryStream(data))
+        {
+            Mp3FileReader mp3audio = new Mp3FileReader(mp3stream);
+            WaveStream waveStream = null;
+            using (waveStream = WaveFormatConversionStream.CreatePcmStream(mp3audio))
+            {
+                WAV wav = new WAV(AudioMemStream(waveStream).ToArray());
+                AudioClip audioClip = AudioClip.Create("Music", wav.SampleCount, 1, wav.Frequency, false);               
+                audioClip.SetData(wav.LeftChannel, 0);
+                callback?.Invoke(audioClip);
+            }
+        }                     
     }
     private static MemoryStream AudioMemStream(WaveStream waveStream)
     {

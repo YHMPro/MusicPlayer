@@ -13,6 +13,41 @@ namespace MusicPlayer
     public class MusicData
     {
         /// <summary>
+        /// 歌曲的数量
+        /// </summary>
+        private static int m_MusicNum = 0;//歌曲的数量
+        /// <summary>
+        /// 歌曲的数量
+        /// </summary>
+        public static int MusicNum
+        {
+            get
+            {
+                if(m_MusicPaths!=null)
+                {
+                    m_MusicNum = m_MusicPaths.Length;
+                }
+                return m_MusicNum;
+            }
+        }
+        /// <summary>
+        /// 歌曲路径数组
+        /// </summary>
+        private static string[] m_MusicPaths = new string[100];
+        /// <summary>
+        /// 歌曲路径数组
+        /// </summary>
+        public static string[] MusicPaths
+        {
+            get
+            {
+                return m_MusicPaths;
+            }
+        }
+
+
+
+        /// <summary>
         /// 音频
         /// </summary>
         private AudioClip m_Ac;
@@ -76,12 +111,12 @@ namespace MusicPlayer
              {
                   Debug.Log("歌曲音频加载成功");
                   m_Ac = ac;//音频                  
-                  LrcInfo.GetLrc(lrcUrl, (lrcInfo) =>
-                  {
-                      Debug.Log("歌曲歌词加载成功");
-                      m_LrcInfo = lrcInfo;//歌词信息
-                      m_IsHaveLrc = true;                                                                       
-                  });
+                  //LrcInfo.GetLrc(lrcUrl, (lrcInfo) =>
+                  //{
+                  //    Debug.Log("歌曲歌词加载成功");
+                  //    m_LrcInfo = lrcInfo;//歌词信息
+                  //    m_IsHaveLrc = true;                                                                       
+                  //});
                  GetAlbumCover(musicUrl, (cover) =>
                  {
                      Debug.Log("歌曲封面加载成功");

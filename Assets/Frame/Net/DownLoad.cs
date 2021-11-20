@@ -39,10 +39,13 @@ namespace Farme.Net
                 if (uwr.isDone && uwr.downloadHandler.isDone)//1.与远程建立通信是否成功  2.给予远程的任务是否完成
                 { break; }
                 yield return uwr.downloadProgress;
-            }
-            
+            }         
             progressCallback?.Invoke(1);//回调1          
-            resultCallback?.Invoke(NAudioPlayer.FromMp3Data(uwr.downloadHandler.data));//回调下载结果
+            NAudioPlayer.FromMp3Data(uwr.downloadHandler.data, (clip) =>
+             {
+                 resultCallback?.Invoke(clip);//回调下载结果
+             });
+           
         }
 
         /// <summary>

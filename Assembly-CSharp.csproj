@@ -92,7 +92,16 @@
     <Compile Include="Assets\LrcInfo.cs" />
     <Compile Include="Assets\NAudioPlayer.cs" />
     <Compile Include="Assets\ProjectScript\MusicData.cs" />
+    <Compile Include="Assets\ProjectScript\MusicPlayerConfigInfo.cs" />
+    <Compile Include="Assets\ProjectScript\MusicPlayerEntry.cs" />
+    <Compile Include="Assets\ProjectScript\MusicUI.cs" />
+    <Compile Include="Assets\ProjectScript\Panel\MusicListPanel.cs" />
+    <Compile Include="Assets\ProjectScript\Panel\MusicPlayControllerPanel.cs" />
+    <Compile Include="Assets\ProjectScript\Panel\MusicPlayInterfacePanel.cs" />
+    <Compile Include="Assets\ProjectScript\Panel\MusicPlaySetPanel.cs" />
+    <Compile Include="Assets\Test.cs" />
     <Compile Include="Assets\WAV.cs" />
+    <Compile Include="Assets\WindowAPI.cs" />
     <None Include="Assets\Frame\Plugins\Log\Debuger.xml" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
@@ -298,17 +307,11 @@
     <Reference Include="UnityEngine.XRModule">
       <HintPath>S:/Unity Pro 2019.3.7f1/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
     </Reference>
-    <Reference Include="Id3Lib">
-      <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Plugins/Id3Lib.dll</HintPath>
-    </Reference>
-    <Reference Include="Mp3Lib">
-      <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Plugins/Mp3Lib.dll</HintPath>
+    <Reference Include="Debuger">
+      <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Frame/Plugins/Log/Debuger.dll</HintPath>
     </Reference>
     <Reference Include="NAudio">
       <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Plugins/NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="Debuger">
-      <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Frame/Plugins/Log/Debuger.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>S:/Unity Pro 2019.3.7f1/Unity/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
