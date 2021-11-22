@@ -7,6 +7,9 @@ using System.Text;
 using Farme.UI;
 using Farme;
 using MusicPlayer.Panel;
+using Farme.Tool;
+using System.Collections.Generic;
+
 namespace MusicPlayer
 {
     /// <summary>
@@ -14,60 +17,39 @@ namespace MusicPlayer
     /// </summary>
     public class MusicData
     {
-        /// <summary>
-        /// 歌曲文件数量
-        /// </summary>
-        private static int m_MusicFileNum = 0;//歌曲的数量
-        /// <summary>
-        /// 歌曲文件数量
-        /// </summary>
-        public static int MusicFileNum
-        {
-            get
-            {
-                if(m_MusicFileNames != null)
-                {
-                    m_MusicFileNum = m_MusicFileNames.Length;
-                }
-                return m_MusicFileNum;
-            }
-        }
-        /// <summary>
-        /// 歌曲文件名数组
-        /// </summary>
-        private static string[] m_MusicFileNames = new string[100];
-        /// <summary>
-        /// 歌曲路径数组
-        /// </summary>
-        public static string[] MusicFileNames
-        {
-            get
-            {
-                return m_MusicFileNames;
-            }
-        }
-        /// <summary>
-        /// 歌曲文件名称读取
-        /// </summary>
-        private static void MusicFileNameRead()
-        {
-            if(MonoSingletonFactory<WindowRoot>.SingletonExist)
-            {
-                WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
-                StandardWindow window = root.GetWindow("Controller");
-                if(window!=null)
-                {
-                    MusicPlaySetPanel panel= window.GetPanel<MusicPlaySetPanel>("SetPanel");
-                    if(panel!=null)
-                    {
-                        string path = panel.MusicFilePath();
+        ///// <summary>
+        ///// 歌词缓存容器   最多缓存  看实际情况来定
+        ///// </summary>
+        //private static Dictionary<string, LrcInfo> m_LrcDic;
+        //private static Dictionary<string,LrcInfo> LrcDic
+        //{
+        //    get
+        //    {
+        //        if(m_LrcDic==null)
+        //        {
+        //            m_LrcDic = new Dictionary<string, LrcInfo>();
+        //        }
+        //        return m_LrcDic;
+        //    }
+        //}
+        ///// <summary>
+        ///// 获取音乐歌词信息
+        ///// </summary>
+        ///// <param name="musicFileName"></param>
+        ///// <param name="callback"></param>
+        //public static void GetMusicLrcInfo(string musicFileName,UnityAction<LrcInfo> callback)
+        //{
+        //    if(LrcDic.TryGetValue(musicFileName,out LrcInfo info))
+        //    {
+        //        callback?.Invoke(info);
+        //    }
+        //}
 
+        private bool m_IsLoadLrc = false;
 
-                    }
-                }              
-            }
-        }
+        private bool m_IsLoadAudio = false;
 
+        private bool m_IsLoadCover = false;
         /// <summary>
         /// 音频
         /// </summary>
@@ -79,15 +61,7 @@ namespace MusicPlayer
         /// <summary>
         /// 歌词信息
         /// </summary>
-        private LrcInfo m_LrcInfo;
-        /// <summary>
-        /// 是否有歌词
-        /// </summary>
-        private bool m_IsHaveLrc;
-        /// <summary>
-        /// 是否有封面
-        /// </summary>
-        private bool m_IsHaveCover;
+        private LrcInfo m_LrcInfo;        
         /// <summary>
         /// 歌曲音频
         /// </summary>
@@ -114,38 +88,71 @@ namespace MusicPlayer
         public LrcInfo LrcInfo
         {
             get
-            {
+            {                 
                 return m_LrcInfo;
             }
         }
+
         /// <summary>
-        /// 初始化歌曲数据
+        /// 歌曲文件名称
         /// </summary>
-        /// <param name="musicUrl">歌曲绝对路径</param>
-        /// <param name="lrcUrl">歌词绝对路径</param>
-        /// <param name="resultCallback">结果回调</param>
-        /// <param name="progressCallback">加载进度回调</param>
-        public void InitMusicData(string musicUrl,string lrcUrl,UnityAction<MusicData> resultCallback,UnityAction <float> progressCallback=null)
+        public void LoadAudio(string musicFileName)
         {
-            //if(musicUrl==null|| musicUrl)
-            DownLoad.DownLoadAudioClipAsset(musicUrl, (ac) =>
+            if(m_IsLoadAudio)
+            {
+                return;
+            }
+            m_IsLoadAudio = true;
+            DownLoad.DownLoadAudioClipAsset(MusicPlayerData.MusicFilePath + "\\" + musicFileName + ".mpc", (clip) =>
              {
-                  Debug.Log("歌曲音频加载成功");
-                  m_Ac = ac;//音频                  
-                  //LrcInfo.GetLrc(lrcUrl, (lrcInfo) =>
-                  //{
-                  //    Debug.Log("歌曲歌词加载成功");
-                  //    m_LrcInfo = lrcInfo;//歌词信息
-                  //    m_IsHaveLrc = true;                                                                       
-                  //});
-                 GetAlbumCover(musicUrl, (cover) =>
+                 m_Ac = clip;//音频
+                 Debuger.Log("加载歌曲音频成功");
+                 GetAlbumCover(MusicPlayerData.MusicFilePath + "\\" + musicFileName + ".mpc", (cover) =>
                  {
                      Debug.Log("歌曲封面加载成功");
                      m_Cover = cover;
-                     m_IsHaveCover = true;
                  });//封面       
-                 resultCallback?.Invoke(this);
-             },progressCallback);
+             });
+        }
+        /// <summary>
+        /// 歌曲文件名称
+        /// </summary>
+        /// <param name="musicFileName"></param>
+        public void LoadLrc(string musicFileName,UnityAction callback)
+        {
+            if(m_IsLoadLrc)
+            {
+                return;
+            }
+            m_IsLoadLrc = true;
+            LrcInfo.GetLrc(MusicPlayerData.MusicFilePath + "\\" + musicFileName + ".lrc",(lrc)=> 
+            {
+                if (lrc != null)
+                {
+                    m_LrcInfo = lrc;
+                    Debuger.Log("加载歌词成功");
+                }
+                else
+                {
+                    m_LrcInfo = new LrcInfo();
+                    Debuger.Log("加载歌词失败,待初始值");
+                }
+                callback?.Invoke();
+                   
+            });
+        }       
+        /// <summary>
+        /// 清除数据
+        /// </summary>
+        public void ClearData()
+        {
+            if(m_Ac!=null)
+            {
+                m_Ac.UnloadAudioData();
+            }
+            UnityEngine.Object.Destroy(m_Ac);
+            UnityEngine.Object.Destroy(m_Cover);
+            m_LrcInfo = null;
         }
         /// <summary>
         /// 获取音乐封面

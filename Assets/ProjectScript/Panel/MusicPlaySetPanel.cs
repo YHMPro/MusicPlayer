@@ -48,20 +48,32 @@ namespace MusicPlayer.Panel
             }
             if(GetComponent("PathSet",out Toggle toggle))
             {
-                toggle.onValueChanged.AddListener(PathSetEvent);
+                toggle.onValueChanged.AddListener(LockMusicFilePath);
+            }
+            if (GetComponent("PathInput", out InputField input))
+            {
+                input.onEndEdit.AddListener(MusicFilePathEditeEndEvent);
             }
         }
         /// <summary>
-        /// 路径设置事件
+        /// 锁定音乐文件夹路径
         /// </summary>
-        /// <param name="isOn"></param>
-        private void PathSetEvent(bool isOn)
+        /// <param name="isOn">是否锁定</param>
+        private void LockMusicFilePath(bool isOn)
         {
-            if(GetComponent("PathInput", out InputField input))
+            if (GetComponent("PathInput", out InputField input))
             {
                 input.interactable = !isOn;
                 input.readOnly = isOn;
             }
+        }
+        /// <summary>
+        /// 音乐文件路径编辑结束时间
+        /// </summary>
+        /// <param name="value">路径</param>
+        private void MusicFilePathEditeEndEvent(string value)
+        {
+            MusicPlayerData.MusicFilePath = value;
         }
 
         private void CloseEvent()

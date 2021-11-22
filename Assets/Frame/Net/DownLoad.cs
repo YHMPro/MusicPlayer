@@ -37,6 +37,10 @@ namespace Farme.Net
             {           
                 progressCallback?.Invoke(uwr.downloadProgress);//1.远程下载进度
                 if (uwr.isDone && uwr.downloadHandler.isDone)//1.与远程建立通信是否成功  2.给予远程的任务是否完成
+                { 
+                    
+                    break; }
+                if (uwr.isNetworkError || uwr.isHttpError)
                 { break; }
                 yield return uwr.downloadProgress;
             }         
@@ -69,15 +73,26 @@ namespace Farme.Net
         {                      
             UnityWebRequest uwr = CreateWebRequest(url);//创建请求     
             UnityWebRequestAsyncOperation ao = uwr.SendWebRequest();//发送下载请求请求
+            bool isSuccess = false;
             while (true)
             {            
                 progressCallback?.Invoke(uwr.downloadProgress);//1.远程下载进度
                 if (uwr.isDone && uwr.downloadHandler.isDone)//1.与远程建立通信是否成功  2.给予远程的任务是否完成
-                { break;}
+                { isSuccess = true; break; }
+                if(uwr.isNetworkError||uwr.isHttpError)
+                { break; }
                 yield return uwr.downloadProgress;
             }
-            progressCallback?.Invoke(1);//回调1
-            resultCallback?.Invoke(Encoding.GetEncoding(GB2312).GetString(uwr.downloadHandler.data));//回调下载结果         
+            if (isSuccess)
+            {
+                progressCallback?.Invoke(1);//回调1
+                resultCallback?.Invoke(Encoding.GetEncoding(GB2312).GetString(uwr.downloadHandler.data));//回调下载结果
+            }
+            else
+            {
+                progressCallback?.Invoke(0);//回调1
+                resultCallback?.Invoke(null);//回调下载结果
+            }
         }
 
         /// <summary>

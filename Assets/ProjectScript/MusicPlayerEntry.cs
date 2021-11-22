@@ -10,8 +10,9 @@ namespace MusicPlayer
     public class MusicPlayerEntry : MonoBehaviour
     {
         private void Awake()
-        {
-            
+        {           
+
+
 
 
 
@@ -25,10 +26,10 @@ namespace MusicPlayer
                     {
                         Debuger.Log("加载控制面板成功");
                     });
-                    window.CreatePanel<MusicPlayInterfacePanel>("Panel\\MusicPlayInterfacePanel", "InterfacePanel", EnumPanelLayer.MIDDLE, (panel) =>
-                    {
-                        Debuger.Log("加载界面面板成功");
-                    });
+                    //window.CreatePanel<MusicPlayInterfacePanel>("Panel\\MusicPlayInterfacePanel", "InterfacePanel", EnumPanelLayer.MIDDLE, (panel) =>
+                    //{
+                    //    Debuger.Log("加载界面面板成功");
+                    //});
                 });                
             }
             

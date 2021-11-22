@@ -30,12 +30,10 @@ namespace MusicPlayer
         /// 偏移量
         /// </summary>
         public string Offset { get; set; }
-
         /// <summary>
         /// 歌词
         /// </summary>
         public Dictionary<double, string> LrcWord = new Dictionary<double, string>();
-
         /// <summary>
         /// 获得歌词信息
         /// </summary>
@@ -45,46 +43,55 @@ namespace MusicPlayer
         {      
             DownLoad.DownLoadTextAsset(lrcURL, (lrcContent) =>
             {
-                LrcInfo lrc = new LrcInfo();//实例歌词信息
-                StringReader sr = new StringReader(lrcContent);//创建字符串读取工具实例
-                string[] lrcContentLines = SplitString(lrcContent);//转换成一行对应一组数据
-                string lrcLine;
-                while ((lrcLine=sr.ReadLine())!=null)
+                if (lrcContent != null)
                 {
-                    if (lrcLine.StartsWith("[ti:"))
+                    LrcInfo lrc = new LrcInfo();//实例歌词信息
+                    StringReader sr = new StringReader(lrcContent);//创建字符串读取工具实例
+                    string[] lrcContentLines = SplitString(lrcContent);//转换成一行对应一组数据
+                    string lrcLine;
+                    while ((lrcLine = sr.ReadLine()) != null)
                     {
-                        lrc.Title = SplitInfo(lrcLine);
+                        if (lrcLine.StartsWith("[ti:"))
+                        {
+                            lrc.Title = SplitInfo(lrcLine);
+                        }
+                        else if (lrcLine.StartsWith("[ar:"))
+                        {
+                            lrc.Artist = SplitInfo(lrcLine);
+                        }
+                        else if (lrcLine.StartsWith("[al:"))
+                        {
+                            lrc.Album = SplitInfo(lrcLine);
+                        }
+                        else if (lrcLine.StartsWith("[by:"))
+                        {
+                            lrc.LrcBy = SplitInfo(lrcLine);
+                        }
+                        else if (lrcLine.StartsWith("[offset:"))
+                        {
+                            lrc.Offset = SplitInfo(lrcLine);
+                        }
+                        else
+                        {
+                            if (lrcLine.Length >50)
+                            {
+                                Regex regex = new Regex(@"\[([0-9.:]*)\]+(.*)", RegexOptions.Compiled);
+                                MatchCollection mc = regex.Matches(lrcLine);
+                                double time = TimeSpan.Parse("00:" + mc[0].Groups[1].Value).TotalSeconds;
+                                string word = mc[0].Groups[2].Value;
+                                lrc.LrcWord.Add(time, word);
+                            }
+                        }
                     }
-                    else if (lrcLine.StartsWith("[ar:"))
-                    {
-                        lrc.Artist = SplitInfo(lrcLine);
-                    }
-                    else if (lrcLine.StartsWith("[al:"))
-                    {
-                        lrc.Album = SplitInfo(lrcLine);
-                    }
-                    else if (lrcLine.StartsWith("[by:"))
-                    {
-                        lrc.LrcBy = SplitInfo(lrcLine);
-                    }
-                    else if (lrcLine.StartsWith("[offset:"))
-                    {
-                        lrc.Offset = SplitInfo(lrcLine);
-                    }
-                    else
-                    {                       
-                        Regex regex = new Regex(@"\[([0-9.:]*)\]+(.*)", RegexOptions.Compiled);
-                        MatchCollection mc = regex.Matches(lrcLine);
-                        double time = TimeSpan.Parse("00:" + mc[0].Groups[1].Value).TotalSeconds;
-                        string word = mc[0].Groups[2].Value;
-                        lrc.LrcWord.Add(time, word);
-                    }
-                }              
-                sr.Close();
-                resultCallback?.Invoke(lrc);
+                    sr.Close();
+                    resultCallback?.Invoke(lrc);
+                }
              });                                     
         }
+        private static void LoadLrc()
+        {
 
+        }
         /// <summary>
         /// 处理信息(私有方法)
         /// </summary>

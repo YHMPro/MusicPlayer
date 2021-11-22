@@ -41,17 +41,17 @@ namespace MusicPlayer
 
         public void PlayEvent()
         {
-            NotMonoFactory<MusicData>.GetInstance().InitMusicData(MP3path, Lrcpath, (musicData) =>
-            {
-                img.sprite = Sprite.Create(musicData.Cover, new Rect(0, 0, musicData.Cover.width, musicData.Cover.height), Vector2.zero);               
-                if(m_audio.Clip!=null)
-                {
-                    m_audio.Clip.UnloadAudioData();
-                }
-                m_audio.Clip = musicData.Ac;
-                m_audio.Play();
-                MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, Con);
-            });
+            //NotMonoFactory<MusicData>.GetInstance().InitMusicData(MP3path, Lrcpath, (musicData) =>
+            //{
+            //    img.sprite = Sprite.Create(musicData.Cover, new Rect(0, 0, musicData.Cover.width, musicData.Cover.height), Vector2.zero);               
+            //    if(m_audio.Clip!=null)
+            //    {
+            //        m_audio.Clip.UnloadAudioData();
+            //    }
+            //    m_audio.Clip = musicData.Ac;
+            //    m_audio.Play();
+            //    MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, Con);
+            //});
         }
 
         public void PauseEvent()

@@ -10,6 +10,13 @@ namespace MusicPlayer
     /// </summary>
     public class MusicUI : BaseMono
     {
+        public RectTransform rectTransform
+        {
+            get
+            {
+               return  transform as RectTransform;
+            }
+        }
         /// <summary>
         /// 用于获取这首歌的路径的钥匙
         /// </summary>
