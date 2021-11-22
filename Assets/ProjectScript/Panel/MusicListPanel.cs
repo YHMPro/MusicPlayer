@@ -62,7 +62,7 @@ namespace MusicPlayer.Panel
             if(m_MusicList!=null)
             {
                 //获取音乐的数量  从音乐数据类中获取
-                int musicNum = MusicData.MusicNum;
+                int musicNum = 0;//MusicData.MusicNum;
                 //固定占用  顶部偏移+底部偏移
                 float fixWitch = 20;
                 //歌曲总的占用=(group.spacing + 100) * musicNum - group.spacing;
@@ -78,9 +78,9 @@ namespace MusicPlayer.Panel
                 int productMusicUINum = 0;               
                 if(m_MusicList.childCount<11)
                 {
-                    if (MusicData.MusicNum < 11)
+                    if (MusicData.MusicFileNum < 11)
                     {
-                        productMusicUINum = MusicData.MusicNum - m_MusicList.childCount;
+                        productMusicUINum = MusicData.MusicFileNum - m_MusicList.childCount;
                     }
                     else
                     {
@@ -108,7 +108,7 @@ namespace MusicPlayer.Panel
         {
             if(m_MusicList!=null)
             {
-                if(MusicData.MusicNum<11)//不具备切换歌曲的功能
+                if(MusicData.MusicFileNum < 11)//不具备切换歌曲的功能
                 {
                     return;
                 }

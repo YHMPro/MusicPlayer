@@ -59,14 +59,26 @@ namespace MusicPlayer.Panel
         {
             if(GetComponent("PathInput", out InputField input))
             {
+                input.interactable = !isOn;
                 input.readOnly = isOn;
             }
         }
 
-
         private void CloseEvent()
         {
             SetState(EnumPanelState.Hide);
+        }
+        /// <summary>
+        /// 歌曲文件路径
+        /// </summary>
+        /// <returns></returns>
+        public string MusicFilePath()
+        {
+            if (GetComponent("PathInput", out InputField input))
+            {
+                return input.text;
+            }
+            return "";
         }
     }
 }

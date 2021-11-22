@@ -7,14 +7,14 @@ public class Test : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        string path = "C:\\Users\\XiaoHeTao\\Desktop\\新建文件夹\\";
+        string path = "F:\\MyMusic\\";
         if (Directory.Exists(path))
         {
-            string[] strArray=  Directory.GetFiles(path,"*.lrc");
-
+            string[] strArray=  Directory.GetFiles(path,"*.mp3");
             foreach (var str in strArray)
             {
-                Debug.Log(str);
+               
+               
             }
         }
         //string []str = DirectoryInfo.

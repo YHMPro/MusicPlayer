@@ -4,7 +4,9 @@ using Farme.Net;
 using System.IO;
 using System;
 using System.Text;
-
+using Farme.UI;
+using Farme;
+using MusicPlayer.Panel;
 namespace MusicPlayer
 {
     /// <summary>
@@ -13,39 +15,58 @@ namespace MusicPlayer
     public class MusicData
     {
         /// <summary>
-        /// 歌曲的数量
+        /// 歌曲文件数量
         /// </summary>
-        private static int m_MusicNum = 0;//歌曲的数量
+        private static int m_MusicFileNum = 0;//歌曲的数量
         /// <summary>
-        /// 歌曲的数量
+        /// 歌曲文件数量
         /// </summary>
-        public static int MusicNum
+        public static int MusicFileNum
         {
             get
             {
-                if(m_MusicPaths!=null)
+                if(m_MusicFileNames != null)
                 {
-                    m_MusicNum = m_MusicPaths.Length;
+                    m_MusicFileNum = m_MusicFileNames.Length;
                 }
-                return m_MusicNum;
+                return m_MusicFileNum;
             }
         }
         /// <summary>
-        /// 歌曲路径数组
+        /// 歌曲文件名数组
         /// </summary>
-        private static string[] m_MusicPaths = new string[100];
+        private static string[] m_MusicFileNames = new string[100];
         /// <summary>
         /// 歌曲路径数组
         /// </summary>
-        public static string[] MusicPaths
+        public static string[] MusicFileNames
         {
             get
             {
-                return m_MusicPaths;
+                return m_MusicFileNames;
             }
         }
+        /// <summary>
+        /// 歌曲文件名称读取
+        /// </summary>
+        private static void MusicFileNameRead()
+        {
+            if(MonoSingletonFactory<WindowRoot>.SingletonExist)
+            {
+                WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
+                StandardWindow window = root.GetWindow("Controller");
+                if(window!=null)
+                {
+                    MusicPlaySetPanel panel= window.GetPanel<MusicPlaySetPanel>("SetPanel");
+                    if(panel!=null)
+                    {
+                        string path = panel.MusicFilePath();
 
 
+                    }
+                }              
+            }
+        }
 
         /// <summary>
         /// 音频
