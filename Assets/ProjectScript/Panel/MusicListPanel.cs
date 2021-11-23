@@ -15,17 +15,31 @@ namespace MusicPlayer.Panel
     public class MusicListPanel : BasePanel
     {
         /// <summary>
+        /// 递增距离  基础值 up  1050   bottom  -50
+        /// </summary>
+        private float Dis
+        {
+            get
+            {
+                return (m_MusicMax - 10f) * 60f;
+            }
+        }
+        /// <summary>
+        /// 音乐列表的最大数量  翻滚的条件限制
+        /// </summary>
+        private int m_MusicMax = 10;
+        /// <summary>
+        /// 音乐列表是否处于滚动状态
+        /// </summary>
+        private bool m_IsRoll = false;
+        /// <summary>
         /// 需要刷新的音乐UI索引
         /// </summary>
         private int m_RefreshMusicUIIndex = 0; //常规 如果是更新底部则+9即可
         /// <summary>
-        /// 顶部索引
+        /// 顶部音乐的索引
         /// </summary>
-        private int m_TopIndex = 0;
-        /// <summary>
-        /// 底部索引
-        /// </summary>
-        private int m_BottomIndex = 9;
+        private int m_MusicIndex = 0;      
         /// <summary>
         /// 音乐UI列表
         /// </summary>
@@ -86,6 +100,15 @@ namespace MusicPlayer.Panel
             }
             MusicListInit();
         }
+
+        private void Update()
+        {
+            if(m_IsRoll)
+            {
+                //触发滚动事件的条件限制
+                RollEvent();
+            }
+        }
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -129,14 +152,14 @@ namespace MusicPlayer.Panel
                 //获取音乐的数量  从音乐数据类中获取
                 int musicNum = MusicPlayerData.MusicFileNum;
                 //固定占用  顶部偏移+底部偏移
-                float fixWitch = 20f;
+                float fixWitch = 40f;
                 //歌曲总的占用=(group.spacing + 100) * musicNum - group.spacing;
                 float musicSumWitch = 120f * musicNum - 20f;
                 //总占用 
                 Vector2 sizeDelta = m_MusicList.sizeDelta;
                 sizeDelta.y = musicSumWitch + fixWitch;
                 m_MusicList.sizeDelta = sizeDelta;              
-                int productMusicUINum = Mathf.Clamp(musicNum, 0, 10);
+                int productMusicUINum = Mathf.Clamp(musicNum, 0, m_MusicMax);
                 for (int index = 0; index < productMusicUINum; index++)
                 {
                     if (GoLoad.Take("Music", out GameObject go, m_MusicList))
@@ -150,6 +173,8 @@ namespace MusicPlayer.Panel
 
                     }
                 }
+                //记录列表此时的世界Y坐标
+                m_MusicLastPosY = m_MusicList.position.y;
             }           
         }
 
@@ -169,14 +194,155 @@ namespace MusicPlayer.Panel
             //待解决   问题:滑动条拖拽太空会导致界面出现空白的问题
         }
         /// <summary>
-        /// 音乐列表滑动事件  拖拽滑动条也会触发此事件
+        /// 滚动事件
+        /// </summary>
+        private void RollEvent()
+        {
+            m_MusicNextPosY = m_MusicList.position.y;
+            float value = m_MusicNextPosY - m_MusicLastPosY;
+            if(value==0)
+            {               
+                Debuger.Log("音乐列表滚动事件停止");
+                m_IsRoll = false;
+                return;
+            }
+            MusicIndexRefresh(value > 0 ? BottomMusicRefresh() : TopMusicRefresh());
+            m_MusicLastPosY = m_MusicNextPosY;
+            #region 忽略
+            //if (m_MusicNextPosY != 0 && m_MusicLastPosY != 0)
+            //{
+            //    if (m_MusicNextPosY != m_MusicLastPosY)
+            //    {
+            //        /*
+            //         *手指从上往下滑动  
+            //         *当末尾元素的世界坐标<=-50时转移元素
+            //         *手指从下往上滑动
+            //         *当头部元素的世界坐标>=1030或1050时转移元素
+            //        */
+            //        float dir = m_MusicNextPosY - m_MusicLastPosY;
+            //        #region 手指从上往下滑动  负
+            //        //if (dir < 0)
+            //        //{
+            //        //    if (m_Bottom.position.y <= -50)
+            //        //    {
+            //        //        Vector2 v = m_Bottom.localPosition;
+            //        //        v.y = m_Top.localPosition.y + 120f;
+            //        //        m_MusicLi.Remove(m_Bottom);
+            //        //        m_MusicLi.Insert(0, m_Bottom);
+            //        //        m_Bottom.localPosition = v;
+
+            //        //        m_Top = m_MusicLi[0];
+            //        //        m_Bottom = m_MusicLi[9];
+            //        //        m_RefreshMusicUIIndex--;
+            //        //        UpdateMusicUIData(dir);
+            //        //    }
+            //        //}
+            //        #endregion
+
+            //        #region 手指从下往上滑动  正
+            //        //if (dir > 0)
+            //        //{
+            //        //    if (m_Top.position.y >= 1050)
+            //        //    {
+            //        //        Vector2 v = m_Top.localPosition;
+            //        //        v.y = m_Bottom.localPosition.y - 120f;
+            //        //        m_MusicLi.Remove(m_Top);
+            //        //        m_MusicLi.Add(m_Top);
+            //        //        m_Top.localPosition = v;
+
+
+            //        //        m_Top = m_MusicLi[0];
+            //        //        m_Bottom = m_MusicLi[9];
+            //        //        m_RefreshMusicUIIndex++;
+            //        //        UpdateMusicUIData(dir);
+            //        //    }
+            //        //}
+            //        #endregion
+            //    }
+            //}
+            #endregion
+
+
+        }
+        #region 更新事件
+        /// <summary>
+        /// 更新底部音乐
+        /// </summary>
+        /// <returns></returns>
+        private int BottomMusicRefresh()
+        {
+            //1630  <- 20首音乐  每首+60的距离
+            if (m_Top.position.y >= 1030+ Dis)
+            {
+                Vector2 v = m_Top.localPosition;
+                v.y = m_Bottom.localPosition.y - 120f;
+                m_MusicLi.Remove(m_Top);
+                m_MusicLi.Add(m_Top);
+                m_Top.localPosition = v;
+                return 1;
+
+            }
+            return 0;
+        }
+        /// <summary>
+        /// 更新顶部音乐
+        /// </summary>
+        /// <returns></returns>
+        private int TopMusicRefresh()
+        {
+            //-650  <- 20首音乐  每首-60的距离
+            if (m_Bottom.position.y <= -50-Dis)
+            {
+                Vector2 v = m_Bottom.localPosition;
+                v.y = m_Top.localPosition.y + 120f;
+                m_MusicLi.Remove(m_Bottom);
+                m_MusicLi.Insert(0, m_Bottom);
+                m_Bottom.localPosition = v;
+                return -1;
+            }
+            return 0;
+        }
+        /// <summary>
+        /// 更新音乐索引
+        /// </summary>
+        /// <param name="value"></param>
+        private void MusicIndexRefresh(int value)
+        {
+            if (value != 0)
+            {
+                m_Top = m_MusicLi[0];
+                m_Bottom = m_MusicLi[m_MusicMax - 1];
+                m_MusicIndex += value;
+                MusicInfoRefresh(value > 0 ? false : true);
+            }        
+        }
+        /// <summary>
+        /// 歌曲信息更新  更新顶部或底部的歌曲信息
+        /// </summary>
+        private void MusicInfoRefresh(bool isTop)
+        {
+            #region 获取音乐文件名称           
+            m_MusicIndex = Mathf.Clamp(m_MusicIndex, 0, MusicPlayerData.MusicFileNames.Length-9);//限制在安全的索引范围，防止意外造成越界错误
+            string musicFileName = MusicPlayerData.MusicFileNames[isTop? m_MusicIndex+8: m_MusicIndex];//提取音乐文件名称  +8是因为列表中最多可同时显示8首音乐的信息
+            #endregion     
+            Debuger.Log(musicFileName);//待
+            //MusicUI musicUI = isTop ? m_Top.GetComponent<MusicUI>() : m_Bottom.GetComponent<MusicUI>();
+            //MusicData musicData = MusicDataManager.GetMusicData(musicFileName);
+            //musicData.LoadLrc(musicFileName, () =>
+            //{
+            //    musicUI.SetInfo(musicData.LrcInfo.Title, musicData.LrcInfo.Artist, musicData.LrcInfo.Album);
+            //});
+        }
+        #endregion
+        /// <summary>
+        /// 音乐列表滑动事件  
         /// </summary>
         private void ScrollRectEvent(Vector2 pos)
         {
             if (m_MusicLi != null)
             {
-                if(m_MusicLi.Count < 10)//不具备切换歌曲的功能
-                {                
+                if (m_MusicLi.Count < m_MusicMax-1)//不具备切换歌曲的功能的限制条件
+                {
                     return;
                 }
                 //获取顶部的歌曲UI
@@ -187,108 +353,10 @@ namespace MusicPlayer.Panel
                 //获取底部的歌曲UI
                 if (m_Bottom == null)
                 {
-                    m_Bottom = m_MusicLi[9];
+                    m_Bottom = m_MusicLi[m_MusicMax-1];
                 }
-                m_MusicNextPosY = m_MusicList.position.y;
-                if (m_MusicNextPosY != 0 && m_MusicLastPosY != 0)
-                {
-                    if (m_MusicNextPosY != m_MusicLastPosY)
-                    {
-                        /*
-                         *手指从上往下滑动  
-                         *当末尾元素的世界坐标<=-50时转移元素
-                         *手指从下往上滑动
-                         *当头部元素的世界坐标>=1030或1050时转移元素
-                        */
-                        float dir = m_MusicNextPosY - m_MusicLastPosY;
-                        #region 手指从上往下滑动  负
-                        if (dir < 0)
-                        {
-                            if (m_Bottom.position.y <=-50 )
-                            {
-                                Vector2 v = m_Bottom.localPosition;
-                                v.y = m_Top.localPosition.y + 120f;
-                                m_MusicLi.Remove(m_Bottom);
-                                m_MusicLi.Insert(0, m_Bottom);
-                                m_Bottom.localPosition = v;
-
-                                m_Top = m_MusicLi[0];
-                                m_Bottom = m_MusicLi[9];
-                                m_RefreshMusicUIIndex--;
-                                UpdateMusicUIData(dir);
-                            }
-                        }
-                        #endregion
-
-                        #region 手指从下往上滑动  正
-                        if (dir > 0)
-                        {
-                            if (m_Top.position.y >= 1050)
-                            {                               
-                                Vector2 v = m_Top.localPosition;
-                                v.y = m_Bottom.localPosition.y - 120f;
-                                m_MusicLi.Remove(m_Top);
-                                m_MusicLi.Add(m_Top);
-                                m_Top.localPosition = v;
-
-
-                                m_Top = m_MusicLi[0];
-                                m_Bottom = m_MusicLi[9];
-                                m_RefreshMusicUIIndex++;
-                                UpdateMusicUIData(dir);
-                            }
-                        }
-                        #endregion
-                        ////更新顶部与底部引用
-                        //if (!Equals(m_Top, m_MusicLi[0]))
-                        //{
-                        //    m_Top = m_MusicLi[0];
-                        //    m_RefreshMusicUIIndex--;
-                        //    UpdateMusicUIData(dir);
-                        //}
-                        //if (!Equals(m_Bottom, m_MusicLi[9]))
-                        //{
-                        //    m_Bottom = m_MusicLi[9];
-                        //    m_RefreshMusicUIIndex++;
-                        //    UpdateMusicUIData(dir);
-                        //}
-                       
-                    }
-                }
-                m_MusicLastPosY = m_MusicNextPosY;             
+                m_IsRoll = true;
             }
-        }
-        /// <summary>
-        /// 更新音乐UI数据
-        /// </summary>
-        /// <param name="dir"></param>
-        private void UpdateMusicUIData(float dir)//调用此方法前已排除 dir=0的情况
-        {
-            #region 获取需要更新的音乐文件名称
-            string musicFileName = "";
-            m_RefreshMusicUIIndex = Mathf.Clamp(m_RefreshMusicUIIndex, 0, MusicPlayerData.MusicFileNames.Length - 1);
-            MusicUI musicUI = null;
-            if (dir > 0)
-            {
-                //更新底部UI的数据   m_RefreshMusicUIIndex+9
-                musicFileName = MusicPlayerData.MusicFileNames[m_RefreshMusicUIIndex + 9];
-                musicUI = m_Bottom.GetComponent<MusicUI>();
-            }
-            if (dir < 0)
-            {
-                //更新顶部UI的数据
-                musicFileName = MusicPlayerData.MusicFileNames[m_RefreshMusicUIIndex];
-                musicUI = m_Top.GetComponent<MusicUI>();
-            }
-            #endregion
-            //根据音乐名称加载对于的Lrc文件
-            MusicData musicData = MusicDataManager.GetMusicData(musicFileName);
-            musicData.LoadLrc(musicFileName, () =>
-            {
-                musicUI.SetInfo(musicData.LrcInfo.Title, musicData.LrcInfo.Artist, musicData.LrcInfo.Album);
-            });
-
-        }
-
+        }   
     }
 }

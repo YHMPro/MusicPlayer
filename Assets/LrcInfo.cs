@@ -10,22 +10,27 @@ namespace MusicPlayer
 {
     public class LrcInfo
     {
+        private string m_Title = "未知";
+        private string m_Artist = "未知";
+        private string m_Album = "未知";
+        private string m_LrcBy = "未知";
+        private Dictionary<double, string> m_LrcWord = new Dictionary<double, string>();
         /// <summary>
         /// 歌曲
         /// </summary>
-        public string Title { get; set; }
+        public string Title { get { return m_Title; } set { m_Title = value; } }
         /// <summary>
         /// 艺术家
         /// </summary>
-        public string Artist { get; set; }
+        public string Artist { get { return m_Artist; } set { m_Artist = value; } }
         /// <summary>
         /// 专辑
         /// </summary>
-        public string Album { get; set; }
+        public string Album { get { return m_Album; } set { m_Album = value; } }
         /// <summary>
         /// 歌词作者
         /// </summary>
-        public string LrcBy { get; set; }
+        public string LrcBy { get { return m_LrcBy; } set { m_LrcBy = value; } }
         /// <summary>
         /// 偏移量
         /// </summary>
@@ -33,7 +38,13 @@ namespace MusicPlayer
         /// <summary>
         /// 歌词
         /// </summary>
-        public Dictionary<double, string> LrcWord = new Dictionary<double, string>();
+        public Dictionary<double, string> LrcWord
+        {
+            get
+            {             
+                return m_LrcWord;
+            }
+        }
         /// <summary>
         /// 获得歌词信息
         /// </summary>
@@ -41,7 +52,7 @@ namespace MusicPlayer
         /// <param name="resultCallback">结果回调：歌词信息</param>   
         public static void GetLrc(string lrcURL,UnityAction<LrcInfo> resultCallback)
         {      
-            DownLoad.DownLoadTextAsset(lrcURL, (lrcContent) =>
+            WebDownloadTool.WebDownloadText(lrcURL, (lrcContent) =>
             {
                 if (lrcContent != null)
                 {
@@ -73,14 +84,14 @@ namespace MusicPlayer
                         }
                         else
                         {
-                            if (lrcLine.Length >50)
-                            {
-                                Regex regex = new Regex(@"\[([0-9.:]*)\]+(.*)", RegexOptions.Compiled);
-                                MatchCollection mc = regex.Matches(lrcLine);
-                                double time = TimeSpan.Parse("00:" + mc[0].Groups[1].Value).TotalSeconds;
-                                string word = mc[0].Groups[2].Value;
-                                lrc.LrcWord.Add(time, word);
-                            }
+                            //if (lrcLine[0]=='['&& Regex.IsMatch(lrcLine, @"\S{10,}"))//匹配满10位以上
+                            //{
+                                //Regex regex = new Regex(@"\[([0-9.:]*)\]+(.*)", RegexOptions.Compiled);
+                                //MatchCollection mc = regex.Matches(lrcLine);
+                                //double time = TimeSpan.Parse("00:" + mc[0].Groups[1].Value).TotalSeconds;
+                                //string word = mc[0].Groups[2].Value;
+                                //lrc.LrcWord.Add(time, word);
+                            //}
                         }
                     }
                     sr.Close();

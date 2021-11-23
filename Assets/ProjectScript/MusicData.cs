@@ -16,35 +16,7 @@ namespace MusicPlayer
     /// 歌曲数据
     /// </summary>
     public class MusicData
-    {
-        ///// <summary>
-        ///// 歌词缓存容器   最多缓存  看实际情况来定
-        ///// </summary>
-        //private static Dictionary<string, LrcInfo> m_LrcDic;
-        //private static Dictionary<string,LrcInfo> LrcDic
-        //{
-        //    get
-        //    {
-        //        if(m_LrcDic==null)
-        //        {
-        //            m_LrcDic = new Dictionary<string, LrcInfo>();
-        //        }
-        //        return m_LrcDic;
-        //    }
-        //}
-        ///// <summary>
-        ///// 获取音乐歌词信息
-        ///// </summary>
-        ///// <param name="musicFileName"></param>
-        ///// <param name="callback"></param>
-        //public static void GetMusicLrcInfo(string musicFileName,UnityAction<LrcInfo> callback)
-        //{
-        //    if(LrcDic.TryGetValue(musicFileName,out LrcInfo info))
-        //    {
-        //        callback?.Invoke(info);
-        //    }
-        //}
-
+    {       
         private bool m_IsLoadLrc = false;
 
         private bool m_IsLoadAudio = false;
@@ -122,6 +94,7 @@ namespace MusicPlayer
         {
             if(m_IsLoadLrc)
             {
+                callback?.Invoke();
                 return;
             }
             m_IsLoadLrc = true;
