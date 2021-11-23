@@ -5,11 +5,16 @@ using UnityEngine.UI;
 
 using Farme;
 using Farme.Audio;
+using Farme.Net;
+
 namespace MusicPlayer
 {
     public class Entry : MonoBehaviour
     {
+
         public Transform Cube;
+        public RectTransform img1;
+        public RectTransform img2;
         string MP3path = "C:\\Users\\XiaoHeTao\\Music\\Wisp X - Stand With Me.mp3";
         //"花たん (花糖) - only my railgun.mp3";
         //"S:\\Unity Pro 2019.3.7f1\\MyGitProject\\MusicPlayer\\Music\\Christophe Beck - Paperman.mp3";
@@ -27,10 +32,11 @@ namespace MusicPlayer
 
         private void Awake()
         {
-
-            m_audio = AudioManager.ApplyForAudio();
-            m_audio.AbleRecycle = false;
+            
+            //m_audio = AudioManager.ApplyForAudio();
+            //m_audio.AbleRecycle = false;
             samples = new float[64];
+            InvokeRepeating("Con", 0, 0.2f);
         }
 
         public void SetURLEnd()
@@ -38,13 +44,28 @@ namespace MusicPlayer
             MP3path = URLInput.text;
             //Lrcpath=
         }
-
+        Audio audio;
+        string path = "C:\\Users\\XiaoHeTao\\Desktop\\Music\\";
         public void PlayEvent()
         {
+            if(audio!=null)
+            {
+                audio.Clip.UnloadAudioData();
+            }
+            WebDownloadTool.WebDownLoadMp3(path + MP3path+".mp3", (clip) =>
+            {
+                if (audio == null)
+                {
+                    audio = AudioManager.ApplyForAudio();
+                    audio.Loop = true;
+                }
+                audio.Clip = clip;
+                audio.Play();
+            });
             //NotMonoFactory<MusicData>.GetInstance().InitMusicData(MP3path, Lrcpath, (musicData) =>
             //{
-            //    img.sprite = Sprite.Create(musicData.Cover, new Rect(0, 0, musicData.Cover.width, musicData.Cover.height), Vector2.zero);               
-            //    if(m_audio.Clip!=null)
+            //    img.sprite = Sprite.Create(musicData.Cover, new Rect(0, 0, musicData.Cover.width, musicData.Cover.height), Vector2.zero);
+            //    if (m_audio.Clip != null)
             //    {
             //        m_audio.Clip.UnloadAudioData();
             //    }
@@ -56,13 +77,13 @@ namespace MusicPlayer
 
         public void PauseEvent()
         {
-            MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, Con);
-            m_audio.Pause();
+           // MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, Con);
+            //m_audio.Pause();
         }
 
         public void LoopEvent()
         {
-            m_audio.Loop = toggle.isOn;
+            //m_audio.Loop = toggle.isOn;
         }
         private void Start()
         {
@@ -136,15 +157,17 @@ namespace MusicPlayer
 
         public void Con()
         {
-            if(m_audio!=null)
+            if(audio!=null)
             {
-                m_audio.GetSpectrumData(samples, 0, FFTWindow.BlackmanHarris);
+                audio.GetSpectrumData(samples, 0, FFTWindow.BlackmanHarris);
                 float num = 0;
                 foreach(var value in samples)
                 {
                     num += value;
                 }
-                Cube.localScale = Vector3.one * num*0.5f;
+                img1.localScale = Vector3.one * num*10;
+                img2.localScale = Vector3.one * num*10;
+
             }
         }
 
