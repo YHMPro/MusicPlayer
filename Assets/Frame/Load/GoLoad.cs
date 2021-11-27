@@ -37,10 +37,26 @@ namespace Farme
         }
         /// <summary>
         /// 拿取Go实例
+        /// 基于Resources加载方式
+        /// </summary>
+        /// <param name="goPath">go路径</param>
+        /// <param name="parent">父级</param>
+        /// <returns>go实例</returns>
+        public static GameObject Take(string goPath,Transform parent = null)
+        {
+            GameObject go = ResourcesLoad.Load<GameObject>(goPath);
+            string goName = go.name;
+            go = Object.Instantiate(go, parent);
+            go.name = goName;
+            return go;
+        }
+        /// <summary>
+        /// 拿取Go实例
         /// 基于AssetBundle加载方式
         /// </summary>
         /// <param name="abName">包名</param>
         /// <param name="resName">资源名</param>
+        /// <param name="result">拿取的Go实例</param>
         /// <param name="parent">父级</param>
         /// <returns>是否成功</returns>
         public static bool Take(string abName,string resName,out GameObject result,Transform parent=null)
@@ -63,6 +79,23 @@ namespace Farme
         }
         /// <summary>
         /// 拿取Go实例
+        /// 基于AssetBundle加载方式
+        /// </summary>
+        /// <param name="abName">包名</param>
+        /// <param name="resName">资源名</param>
+        /// <param name="parent">父级</param>
+        /// <returns></returns>
+        public static GameObject Take(string abName, string resName, Transform parent = null)
+        {
+            GameObject go = AssetBundleLoad.LoadAsset<GameObject>(abName, resName);
+            string goName = go.name;
+            go = Object.Instantiate(go, parent);
+            go.name = goName;
+            return go;
+        }
+        /// <summary>
+        /// 拿取Go实例
+        /// 基于AssetBundle加载方式
         /// </summary>
         /// <param name="abName">包名</param>
         /// <param name="resName">资源名</param>
@@ -83,9 +116,9 @@ namespace Farme
                      {
                          go = Object.Instantiate(go);
                      }
-                     go.name = goName;
-                     callback?.Invoke(go);
+                     go.name = goName;                   
                  }
+                 callback?.Invoke(go);
              });
         }
 
@@ -111,9 +144,9 @@ namespace Farme
                      {
                          go=Object.Instantiate(go);
                      }
-                     go.name = goName;
-                     callback?.Invoke(go);
-                 }             
+                     go.name = goName;                   
+                 }
+                 callback?.Invoke(go);
              });                           
         }
         #endregion

@@ -10,6 +10,9 @@ namespace MusicPlayer
     /// </summary>
     public class MusicUI : BaseMono
     {
+        private Text m_MusicName;
+        private Text m_SingerName;
+        private Text m_AlbumName;
         public RectTransform rectTransform
         {
             get
@@ -18,21 +21,24 @@ namespace MusicPlayer
             }
         }
         /// <summary>
-        /// 用于获取这首歌的路径的钥匙
+        /// 用于
         /// </summary>
         private string m_MusicKey = "";
         protected override void Awake()
         {
             base.Awake();
             RegisterComponentsTypes<Text>();
+            GetComponent<Button>().onClick.AddListener(DoubleClickEvent);
+            m_MusicName = GetComponent<Text>("TitleContent");
+            m_SingerName = GetComponent<Text>("ArtistContent");
+            m_AlbumName = GetComponent<Text>("AlbumContent");
         }
 
         protected override void Start()
         {
             base.Start();
-            GetComponent<Button>().onClick.AddListener(DoubleClickEvent);
+               
         }
-
         protected override void OnDestroy()
         {
             GetComponent<Button>().onClick.RemoveListener(DoubleClickEvent);
@@ -46,33 +52,9 @@ namespace MusicPlayer
         /// <param name="album">专辑名称</param>
         public void SetInfo(string title,string artist,string album)
         {
-            string[] strNameArray = new string[] { "TitleContent", "ArtistContent", "AlbumContent" };
-            foreach(var strName in  strNameArray)
-            {
-                if (GetComponent(strName, out Text contentText))
-                {
-                    string content = "";
-                    switch (strName)
-                    {
-                        case "TitleContent":
-                            {
-                                content = title;
-                                break;
-                            }
-                        case "ArtistContent":
-                            {
-                                content = artist;
-                                break;
-                            }
-                        case "AlbumContent":
-                            {
-                                content = album;
-                                break;
-                            }
-                    }
-                    contentText.text = content;
-                }
-            }
+            m_MusicName.text = title.Trim();//去除字符串前后空字符在赋值
+            m_SingerName.text = artist.Trim();//去除字符串前后空字符在赋值
+            m_AlbumName.text = album.Trim();//去除字符串前后空字符在赋值       
         }
         /// <summary>
         /// 单击

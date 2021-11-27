@@ -37,9 +37,9 @@ namespace Farme
             AsyncOperation ao = SceneManager.LoadSceneAsync(sceneName);
             while (!ao.isDone)//等待场景加载完成
             {
-                loadProgressCallback?.Invoke(ao.progress);
-                yield return ao.progress;
+                loadProgressCallback?.Invoke(ao.progress);               
             }
+            yield return ao;
             //用于初始化数据
             endLoadCallback?.Invoke();
         }

@@ -72,39 +72,23 @@ namespace Farme
             {
                 reslutCallback?.Invoke();
                 return;
-            }
-            if (!File.Exists(m_PackageCatalogueFile_URL + m_MainABName))//判定主包文件是否存在
-            {
-                Debuger.LogError("主包文件路径错误!!!");
-                return;
             }          
-            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEInitMainAB(reslutCallback));
+            if (FileExists(m_PackageCatalogueFile_URL + m_MainABName))
+            {
+                MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEInitMainAB(reslutCallback));
+            }
         }
         private static IEnumerator IEInitMainAB(UnityAction reslutCallback=null)
-        {          
-                AssetBundleCreateRequest abcr = AssetBundle.LoadFromFileAsync(m_PackageCatalogueFile_URL + m_MainABName);
-                while(true)
-                {
-                    if(abcr.isDone)
-                    {
-                        Debuger.Log("主包加载成功");
-                        break;
-                    }                   
-                    yield return abcr.progress;
-                }
-                m_MainAB = abcr.assetBundle;
-                AssetBundleRequest abr = m_MainAB.LoadAssetAsync<AssetBundleManifest>("AssetBundleManifest");
-                while(true)
-                {
-                    if(abr.isDone)
-                    {
-                        Debuger.Log("包依赖信息获取成功");
-                        break;
-                    }
-                    yield return abr.progress;
-                }
-                m_MainABInfo = abr.asset as AssetBundleManifest;
-                reslutCallback?.Invoke();         
+        {
+            AssetBundleCreateRequest abcr = AssetBundle.LoadFromFileAsync(m_PackageCatalogueFile_URL + m_MainABName);
+            yield return abcr;//等待异步请求完成      
+            Debuger.Log("主包加载成功。");
+            m_MainAB = abcr.assetBundle;
+            AssetBundleRequest abr = m_MainAB.LoadAssetAsync<AssetBundleManifest>("AssetBundleManifest");
+            yield return abr;//等待异步请求完成  
+            Debuger.Log("包依赖信息获取成功。");
+            m_MainABInfo = abr.asset as AssetBundleManifest;
+            reslutCallback?.Invoke();
         }
         #endregion
         #region 异步加载资源
@@ -118,6 +102,12 @@ namespace Farme
         public static void LoadAssetAsync<T>(string abName, string resName, UnityAction<T> resultCallback) where T : Object
         {
             InitMainABAsync(() => {
+                if (m_MainAB == null || m_MainABInfo == null)
+                {
+                    Debuger.LogError("主包或主包信息加载失败。");
+                    resultCallback?.Invoke(null);
+                    return;
+                }
                 InitAssetBundleDependenciesAsync(abName, (ab) => {
                     if(ab==null)
                     {
@@ -131,20 +121,13 @@ namespace Farme
         private static IEnumerator IELoadAsset<T>(AssetBundle ab, string resName, UnityAction<T> resultCallback) where T : Object
         {
             AssetBundleRequest abr = ab.LoadAssetAsync<T>(resName);
-            while (true)
-            {
-                if (abr.isDone)
-                {
-                    break;
-                }
-                yield return abr.progress;
-            }
-            T t = abr.asset as T;
-            if (t==null)
+            yield return abr;//等待异步请求完成     
+            T asset = abr.asset as T;
+            if (asset == null)
             {
                 Debuger.LogError("资源:" + resName + "不存在");
             }
-            resultCallback?.Invoke(abr.asset as T);         
+            resultCallback?.Invoke(asset);
         }
         /// <summary>
         /// 初始化包的依赖包并加载该包
@@ -156,64 +139,47 @@ namespace Farme
             MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEInitAssetBundleDependencies(abName,reslutCallback));
         }
         private static IEnumerator IEInitAssetBundleDependencies(string abName,UnityAction<AssetBundle> reslutCallback)
-        {
-            AssetBundle ab;
-            AssetBundleCreateRequest abcr;
-            //获取存在依赖关系的包   
-            string[] dependenciesABundle = m_MainABInfo.GetAllDependencies(abName);
-            //逐个遍历所有与自身存在依赖关系的包
-            for (int Index = 0; Index < dependenciesABundle.Length; Index++)
+        {     
+            if (FileExists(m_PackageCatalogueFile_URL + abName))
             {
-                //判断依赖包是否已经加载过
-                if (!m_ABDic.ContainsKey(dependenciesABundle[Index]))
+                AssetBundle ab;
+                AssetBundleCreateRequest abcr;
+                //获取存在依赖关系的包   
+                string[] dependenciesABundle = m_MainABInfo.GetAllDependencies(abName);
+                //逐个遍历所有与自身存在依赖关系的包
+                for (int Index = 0; Index < dependenciesABundle.Length; Index++)
                 {
-                    if(!File.Exists(m_PackageCatalogueFile_URL + dependenciesABundle[Index]))//判定包文件是否存在
+                    //判断依赖包是否已经加载过
+                    if (!m_ABDic.ContainsKey(dependenciesABundle[Index]))
                     {
-                        Debuger.LogError(dependenciesABundle[Index] + "包文件不存在");
-                        break;
-                    }
-                    abcr = AssetBundle.LoadFromFileAsync(m_PackageCatalogueFile_URL + dependenciesABundle[Index]);
-                    while (true)
-                    {
-                        if (abcr.isDone)
+                        if(FileExists(m_PackageCatalogueFile_URL + dependenciesABundle[Index]))
                         {
-                            break;
-                        }
-                        yield return abcr.progress;
+                            abcr = AssetBundle.LoadFromFileAsync(m_PackageCatalogueFile_URL + dependenciesABundle[Index]);
+                            yield return abcr;//等待异步请求完成 
+                            ab = abcr.assetBundle;
+                            //添加到包容器当中
+                            m_ABDic.Add(dependenciesABundle[Index], ab);
+                        }                                                  
                     }
-                    ab = abcr.assetBundle;
-                    //添加到包容器当中
-                    m_ABDic.Add(dependenciesABundle[Index], ab);
                 }
-            }
-            if(m_ABDic.TryGetValue(abName,out ab))
-            {
-                reslutCallback?.Invoke(ab);
-            }
-            else
-            {
-                if (!File.Exists(m_PackageCatalogueFile_URL + abName))//判定包文件是否存在
+                if (m_ABDic.TryGetValue(abName, out ab))
                 {
-                    Debuger.LogError(abName + "包文件不存在");
-                    reslutCallback?.Invoke(null);
+                    reslutCallback?.Invoke(ab);
                 }
                 else
                 {
                     abcr = AssetBundle.LoadFromFileAsync(m_PackageCatalogueFile_URL + abName);
-                    while (true)
-                    {
-                        if (abcr.isDone)
-                        {
-                            break;
-                        }
-                        yield return abcr.progress;
-                    }
+                    yield return abcr;//等待异步请求完成              
                     ab = abcr.assetBundle;
                     //将子包添加到包容器当中
                     m_ABDic.Add(abName, ab);
                     reslutCallback?.Invoke(ab);
-                }             
-            }                 
+                }
+            }
+            else
+            {
+                reslutCallback?.Invoke(null);
+            }
         }
         #endregion
         #region 初始化主包与包配置信息
@@ -227,14 +193,13 @@ namespace Farme
             {
                 return true;
             }
-            if (!File.Exists(m_PackageCatalogueFile_URL + m_MainABName))
+            if(FileExists(m_PackageCatalogueFile_URL + m_MainABName))
             {
-                Debuger.LogError("主包文件路径错误!!!");
-                return false;
+                m_MainAB = AssetBundle.LoadFromFile(m_PackageCatalogueFile_URL + m_MainABName);//加载主包
+                m_MainABInfo = m_MainAB.LoadAsset<AssetBundleManifest>("AssetBundleManifest");//加载主包配置信息
+                return true;
             }
-            m_MainAB = AssetBundle.LoadFromFile(m_PackageCatalogueFile_URL + m_MainABName);//加载主包
-            m_MainABInfo = m_MainAB.LoadAsset<AssetBundleManifest>("AssetBundleManifest");//加载主包配置信息
-            return true;
+            return false;         
         }
         #endregion
         #region 同步加载       
@@ -283,45 +248,39 @@ namespace Farme
         /// <returns>AB包</returns>
         private static AssetBundle InitAssetBundleDependencies(string abName)
         {
-            AssetBundle ab;
-            //获取存在依赖关系的包   
-            string[] dependenciesABundle = m_MainABInfo.GetAllDependencies(abName);
-            //逐个遍历所有与自身存在依赖关系的包
-            for (int Index = 0; Index < dependenciesABundle.Length; Index++)
+            if (FileExists(m_PackageCatalogueFile_URL + abName))
             {
-                //判断依赖包是否已经加载过
-                if (!m_ABDic.ContainsKey(dependenciesABundle[Index]))
+                AssetBundle ab;
+                //获取存在依赖关系的包   
+                string[] dependenciesABundle = m_MainABInfo.GetAllDependencies(abName);
+                //逐个遍历所有与自身存在依赖关系的包
+                for (int Index = 0; Index < dependenciesABundle.Length; Index++)
                 {
-                    if (!File.Exists(m_PackageCatalogueFile_URL + dependenciesABundle[Index]))//判定包文件是否存在
+                    //判断依赖包是否已经加载过
+                    if (!m_ABDic.ContainsKey(dependenciesABundle[Index]))
                     {
-                        Debuger.LogError(dependenciesABundle[Index] + "包文件不存在");
-                        break;
+                        if (FileExists(m_PackageCatalogueFile_URL + dependenciesABundle[Index]))
+                        {
+                            //加载包
+                            ab = AssetBundle.LoadFromFile(m_PackageCatalogueFile_URL + dependenciesABundle[Index]);
+                            //添加到包容器当中
+                            m_ABDic.Add(dependenciesABundle[Index], ab);
+                        }
                     }
-                    //加载包
-                    ab = AssetBundle.LoadFromFile(m_PackageCatalogueFile_URL + dependenciesABundle[Index]);
-                    //添加到包容器当中
-                    m_ABDic.Add(dependenciesABundle[Index], ab);
                 }
-            }
-            if(m_ABDic.TryGetValue(abName,out ab))
-            {
-                return ab;
-            }
-            else
-            {
-                if (!File.Exists(m_PackageCatalogueFile_URL + abName))//判定包文件是否存在
+                if (m_ABDic.TryGetValue(abName, out ab))
                 {
-                    Debuger.LogError(abName + "包文件不存在");
-                    return null;
+                    return ab;
                 }
                 else
                 {
-                    ab = AssetBundle.LoadFromFile(m_PackageCatalogueFile_URL + abName);                    
+                    ab = AssetBundle.LoadFromFile(m_PackageCatalogueFile_URL + abName);
                     //将子包添加到包容器当中
                     m_ABDic.Add(abName, ab);
                     return ab;
                 }
             }
+            return null;
         }
         #endregion
         #region 卸载资源
@@ -357,5 +316,22 @@ namespace Farme
             Debuger.LogWarning("卸载的      " + abName + "      包不存在。");
         }
         #endregion
+        /// <summary>
+        /// 文件路径判断
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>是否存在</returns>
+        private static bool FileExists(string filePath)
+        {
+            if(File.Exists(filePath))
+            {
+                return true;
+            }
+            else
+            {
+                Debuger.LogError("路径:[" + filePath + "]不存在");
+                return false;
+            }
+        }
     }
 }

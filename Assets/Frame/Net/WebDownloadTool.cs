@@ -10,71 +10,82 @@ namespace Farme.Net
     /// 网络下载工具
     /// </summary>
     public class WebDownloadTool 
-    {        
+    {
+        public static Texture2D DefaultTexture2D = null;
         private const string GB2312 = "gb2312";//用处含有未知
         private static float m_DownloadTextureRequestOutTime = 10;
         private static float m_DownloadAssetBundleOutTime = 10;
         private static float m_DownloadTextRequestOutTime = 5;
 
-        public static void WebDownLoadMp3(string url, UnityAction<AudioClip> resultCallback, UnityAction<float> downLoadProgress = null, UnityAction requestTimeOutCallback = null)
-        {
-            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEWebDownLoadMp3(url, resultCallback, downLoadProgress, requestTimeOutCallback));
-        }
 
-        private static IEnumerator IEWebDownLoadMp3(string url, UnityAction<AudioClip> resultCallback, UnityAction<float> downLoadProgress = null, UnityAction requestTimeOutCallback = null)
+        #region 音效下载
+        /// <summary>
+        /// 音效下载(仅限MP3)
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="resultCallback">结果回调</param>
+        public static void WebDownLoadAudioClipMP3(string url,UnityAction<AudioClip> resultCallback)
+        {
+            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEWebDownLoadAudioClipMP3(url,resultCallback));
+        }
+        private static IEnumerator IEWebDownLoadAudioClipMP3(string url, UnityAction<AudioClip> resultCallback)
         {
             UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.UNKNOWN);
-            www.SendWebRequest();//发送请求
-            Coroutine cor = MonoSingletonFactory<ShareMono>.GetSingleton().DelayAction(m_DownloadAssetBundleOutTime, requestTimeOutCallback);
-            while (true)
+            UnityWebRequestAsyncOperation uwrao = www.SendWebRequest();//发送请求 
+            yield return uwrao;//等待异步请求完成
+            if (www.isHttpError || www.isNetworkError)
             {
-                downLoadProgress?.Invoke(www.downloadProgress);//回调下载进度
-                if (www.isDone && www.downloadHandler.isDone)
-                {
-                    break;
-                }
-                else
-                {
-                    if (cor != null && www.downloadProgress != 0)
-                    {
-                        MonoSingletonFactory<ShareMono>.GetSingleton().StopCoroutine(cor);//撤销下载超时回调
-                        cor = null;
-                    }
-                }
-                yield return www.downloadProgress;
+                Debuger.Log(www.error);
+                resultCallback?.Invoke(null);
+                yield break;//直接结束协程的后续操作
             }
-            NAudioPlayer.FromMp3Data(www.downloadHandler.data, (clip) =>
-            {
-                resultCallback?.Invoke(clip);//回调下载结果
-            });
+            MP3Tool.FromMp3Data(www.downloadHandler.data, resultCallback);
         }
+        /// <summary>
+        /// 音效下载(MP3音效下载不支持)
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="audioType">音效类型</param>
+        /// <param name="resultCallback">结果回调</param>
+        public static void WebDownLoadAudioClip(string url, AudioType audioType, UnityAction<AudioClip> resultCallback)
+        {
+            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEWebDownLoadAudioClip(url, audioType,resultCallback));
+        }
+        private static IEnumerator IEWebDownLoadAudioClip(string url,AudioType audioType, UnityAction<AudioClip> resultCallback)
+        {
+            UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, audioType);
+            UnityWebRequestAsyncOperation uwrao = www.SendWebRequest();//发送请求 
+            yield return uwrao;//等待异步请求完成
+            if (www.isHttpError || www.isNetworkError)
+            {
+                Debuger.Log(www.error);
+                resultCallback?.Invoke(null);
+                yield break;//直接结束协程的后续操作
+            }
+            resultCallback?.Invoke((www.downloadHandler as DownloadHandlerAudioClip).audioClip);
+        }
+        #endregion
 
         #region 文本下载
-        public static void WebDownloadText(string url, UnityAction<string> resultCallback, UnityAction<float> downLoadProgress = null, UnityAction requestTimeOutCallback = null)
+        /// <summary>
+        /// 文本下载
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="resultCallback">结果回调</param>
+        public static void WebDownloadText(string url, UnityAction<string> resultCallback)
         {
-            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEWebDownloadText(url, resultCallback, downLoadProgress, requestTimeOutCallback));
+            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEWebDownloadText(url, resultCallback));
         }
-        private static IEnumerator IEWebDownloadText(string url, UnityAction<string> resultCallback, UnityAction<float> downLoadProgress = null, UnityAction requestTimeOutCallback = null)
+        private static IEnumerator IEWebDownloadText(string url, UnityAction<string> resultCallback)
         {
             UnityWebRequest www = UnityWebRequest.Get(url);//创建网络请求
-            www.SendWebRequest();//发送请求
-            Coroutine cor = MonoSingletonFactory<ShareMono>.GetSingleton().DelayAction(m_DownloadAssetBundleOutTime, requestTimeOutCallback);
-            while (true)
+            UnityWebRequestAsyncOperation uwrao = www.SendWebRequest();//发送请求
+            yield return uwrao;//等待异步请求完成
+            if (www.isHttpError || www.isNetworkError)
             {
-                downLoadProgress?.Invoke(www.downloadProgress);//回调下载进度
-                if (www.isDone && www.downloadHandler.isDone)
-                {
-                    break;
-                }
-                else
-                {
-                    if (cor != null && www.downloadProgress != 0)
-                    {
-                        MonoSingletonFactory<ShareMono>.GetSingleton().StopCoroutine(cor);//撤销下载超时回调
-                        cor = null;
-                    }
-                }
-                yield return www.downloadProgress;
+                Debuger.Log(www.error);
+                resultCallback?.Invoke(null);
+                yield break;//直接结束协程的后续操作
             }
             /*Encoding.GetEncoding(GB2312)为特殊处理  暂不知为何为GB2312  本解释只针对文本编码格式ANSI类型转
              * Unity的文本编码UTF-8
@@ -84,76 +95,52 @@ namespace Farme.Net
         #endregion
 
         #region AB包下载
-        public static void WebDownloadAssetBundle(string url, UnityAction<AssetBundle> resultCallback, UnityAction<float> downLoadProgress = null, UnityAction requestTimeOutCallback = null)
+        /// <summary>
+        /// AB包下载
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="resultCallback">结果回调</param>
+        public static void WebDownloadAssetBundle(string url, UnityAction<AssetBundle> resultCallback)
         {
-            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEWebDownloadAssetBundle(url, resultCallback, downLoadProgress, requestTimeOutCallback));
+            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEWebDownloadAssetBundle(url, resultCallback));
         }
-        private static IEnumerator IEWebDownloadAssetBundle(string url, UnityAction<AssetBundle> resultCallback, UnityAction<float> downLoadProgress = null, UnityAction requestTimeOutCallback = null)
+        private static IEnumerator IEWebDownloadAssetBundle(string url, UnityAction<AssetBundle> resultCallback)
         {
             UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(url);//创建网络请求
-            www.SendWebRequest();//发送请求
-            while(true)
+            UnityWebRequestAsyncOperation uwrao = www.SendWebRequest();//发送请求
+            yield return uwrao;//等待异步请求完成
+            if (www.isHttpError || www.isNetworkError)
             {
-                if (www.downloadHandler.isDone)
-                {
-                    Debuger.Log(www.isDone);
-                    break;
-                }
-                yield return www;
+                Debuger.Log(www.error);
+                resultCallback?.Invoke(null);
+                yield break;//直接结束协程的后续操作
             }
-            //Coroutine cor = MonoSingletonFactory<ShareMono>.GetSingleton().DelayUAction(m_DownloadAssetBundleOutTime, requestTimeOutCallback);
-            //while (true)
-            //{                            
-            //    downLoadProgress?.Invoke(www.downloadProgress);//回调下载进度
-            //    if (www.isDone && www.downloadHandler.isDone)
-            //    {                   
-            //        break;
-            //    }
-            //    else
-            //    {
-            //        if (cor != null&&www.downloadProgress!=0)
-            //        {
-            //            MonoSingletonFactory<ShareMono>.GetSingleton().StopCoroutine(cor);//撤销下载超时回调
-            //            cor = null;
-            //        }
-            //    }
-            
-            //}
-            //resultCallback?.Invoke(DownloadHandlerAssetBundle.GetContent(www));
+            resultCallback?.Invoke(DownloadHandlerAssetBundle.GetContent(www));           
         }
         #endregion
 
         #region 纹理下载
-        public static void WebDownloadTexture(string url, UnityAction<Texture2D> resultCallback, UnityAction<float> downLoadProgress = null, UnityAction requestTimeOutCallback=null)
+        /// <summary>
+        /// 纹理下载
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="resultCallback">结果回调</param>
+        public static void WebDownloadTexture(string url, UnityAction<Texture2D> resultCallback)
         {
-            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEWebDownloadTexture(url, resultCallback, downLoadProgress,()=> 
-            {
-
-            }));
+            MonoSingletonFactory<ShareMono>.GetSingleton().StartCoroutine(IEWebDownloadTexture(url, resultCallback));
         }       
-        private static IEnumerator IEWebDownloadTexture(string url, UnityAction<Texture2D> resultCallback,UnityAction<float> downLoadProgress = null, UnityAction requestTimeOutCallback=null)
+        private static IEnumerator IEWebDownloadTexture(string url, UnityAction<Texture2D> resultCallback)
         {
             UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);//创建网络请求
-            www.SendWebRequest();//发送请求
-            Coroutine cor = MonoSingletonFactory<ShareMono>.GetSingleton().DelayAction(m_DownloadAssetBundleOutTime, requestTimeOutCallback);
-            while (true)
+            UnityWebRequestAsyncOperation uwrao = www.SendWebRequest();//发送请求
+            yield return uwrao;//等待异步请求完成
+            if(www.isHttpError||www.isNetworkError)
             {
-                downLoadProgress?.Invoke(www.downloadProgress);//回调下载进度
-                if (www.isDone && www.downloadHandler.isDone)
-                {
-                    break;
-                }
-                else
-                {
-                    if (cor != null && www.downloadProgress != 0)
-                    {
-                        MonoSingletonFactory<ShareMono>.GetSingleton().StopCoroutine(cor);//撤销下载超时回调
-                        cor = null;
-                    }
-                }
-                yield return www.downloadProgress;
-            }
-            resultCallback?.Invoke(DownloadHandlerTexture.GetContent(www));
+                Debuger.Log(www.error);
+                resultCallback?.Invoke(DefaultTexture2D);
+                yield break;//直接结束协程的后续操作
+            }        
+            resultCallback?.Invoke(DownloadHandlerTexture.GetContent(www));        
         }
         #endregion
     }

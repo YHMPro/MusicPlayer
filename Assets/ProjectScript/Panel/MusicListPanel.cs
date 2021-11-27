@@ -45,6 +45,10 @@ namespace MusicPlayer.Panel
         /// </summary>
         private List<RectTransform> m_MusicLi = new List<RectTransform>();
         /// <summary>
+        /// 音乐索引
+        /// </summary>
+        private int[] m_MusicIndexs = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        /// <summary>
         /// 用于记录音乐列表中的位置信息  在每次关闭时记录一次(本地坐标)
         /// </summary>
         private Vector2[] m_MusicPoss = null;
@@ -164,13 +168,15 @@ namespace MusicPlayer.Panel
                 {
                     if (GoLoad.Take("Music", out GameObject go, m_MusicList))
                     {
-                        MusicUI musicUI = go.GetComponent<MusicUI>();
-                        m_MusicLi.Add(musicUI.rectTransform);
+                        MusicUI musicUI = go.GetComponent<MusicUI>();                    
                         //设置信息   通过歌词文件进行获取
-                        
-
-
-
+                        string musicFileName = MusicPlayerData.MusicFileNames[index];//提取音乐文件名称  
+                        MusicInfo musicInfo = MusicInfoManager.GetMusicInfo(musicFileName + ".lrc");
+                        if (musicInfo != null)
+                        {
+                            musicUI.SetInfo(musicInfo.MusicName, musicInfo.SingerName, musicInfo.AlbumName);
+                        }
+                        m_MusicLi.Add(musicUI.rectTransform);
                     }
                 }
                 //记录列表此时的世界Y坐标
@@ -208,61 +214,6 @@ namespace MusicPlayer.Panel
             }
             MusicIndexRefresh(value > 0 ? BottomMusicRefresh() : TopMusicRefresh());
             m_MusicLastPosY = m_MusicNextPosY;
-            #region 忽略
-            //if (m_MusicNextPosY != 0 && m_MusicLastPosY != 0)
-            //{
-            //    if (m_MusicNextPosY != m_MusicLastPosY)
-            //    {
-            //        /*
-            //         *手指从上往下滑动  
-            //         *当末尾元素的世界坐标<=-50时转移元素
-            //         *手指从下往上滑动
-            //         *当头部元素的世界坐标>=1030或1050时转移元素
-            //        */
-            //        float dir = m_MusicNextPosY - m_MusicLastPosY;
-            //        #region 手指从上往下滑动  负
-            //        //if (dir < 0)
-            //        //{
-            //        //    if (m_Bottom.position.y <= -50)
-            //        //    {
-            //        //        Vector2 v = m_Bottom.localPosition;
-            //        //        v.y = m_Top.localPosition.y + 120f;
-            //        //        m_MusicLi.Remove(m_Bottom);
-            //        //        m_MusicLi.Insert(0, m_Bottom);
-            //        //        m_Bottom.localPosition = v;
-
-            //        //        m_Top = m_MusicLi[0];
-            //        //        m_Bottom = m_MusicLi[9];
-            //        //        m_RefreshMusicUIIndex--;
-            //        //        UpdateMusicUIData(dir);
-            //        //    }
-            //        //}
-            //        #endregion
-
-            //        #region 手指从下往上滑动  正
-            //        //if (dir > 0)
-            //        //{
-            //        //    if (m_Top.position.y >= 1050)
-            //        //    {
-            //        //        Vector2 v = m_Top.localPosition;
-            //        //        v.y = m_Bottom.localPosition.y - 120f;
-            //        //        m_MusicLi.Remove(m_Top);
-            //        //        m_MusicLi.Add(m_Top);
-            //        //        m_Top.localPosition = v;
-
-
-            //        //        m_Top = m_MusicLi[0];
-            //        //        m_Bottom = m_MusicLi[9];
-            //        //        m_RefreshMusicUIIndex++;
-            //        //        UpdateMusicUIData(dir);
-            //        //    }
-            //        //}
-            //        #endregion
-            //    }
-            //}
-            #endregion
-
-
         }
         #region 更新事件
         /// <summary>
@@ -280,7 +231,6 @@ namespace MusicPlayer.Panel
                 m_MusicLi.Add(m_Top);
                 m_Top.localPosition = v;
                 return 1;
-
             }
             return 0;
         }
@@ -308,13 +258,10 @@ namespace MusicPlayer.Panel
         /// <param name="value"></param>
         private void MusicIndexRefresh(int value)
         {
-            if (value != 0)
-            {
-                m_Top = m_MusicLi[0];
-                m_Bottom = m_MusicLi[m_MusicMax - 1];
-                m_MusicIndex += value;
-                MusicInfoRefresh(value > 0 ? false : true);
-            }        
+            m_Top = m_MusicLi[0];
+            m_Bottom = m_MusicLi[m_MusicMax - 1];
+            m_MusicIndex += value;
+            MusicInfoRefresh(value > 0 ? false : true);
         }
         /// <summary>
         /// 歌曲信息更新  更新顶部或底部的歌曲信息
@@ -325,13 +272,13 @@ namespace MusicPlayer.Panel
             m_MusicIndex = Mathf.Clamp(m_MusicIndex, 0, MusicPlayerData.MusicFileNames.Length-9);//限制在安全的索引范围，防止意外造成越界错误
             string musicFileName = MusicPlayerData.MusicFileNames[isTop? m_MusicIndex+8: m_MusicIndex];//提取音乐文件名称  +8是因为列表中最多可同时显示8首音乐的信息
             #endregion     
-            Debuger.Log(musicFileName);//待
-            //MusicUI musicUI = isTop ? m_Top.GetComponent<MusicUI>() : m_Bottom.GetComponent<MusicUI>();
-            //MusicData musicData = MusicDataManager.GetMusicData(musicFileName);
-            //musicData.LoadLrc(musicFileName, () =>
-            //{
-            //    musicUI.SetInfo(musicData.LrcInfo.Title, musicData.LrcInfo.Artist, musicData.LrcInfo.Album);
-            //});
+            Debuger.LogWarning("更新歌曲:" + musicFileName);
+            MusicUI musicUI = isTop ? m_Top.GetComponent<MusicUI>() : m_Bottom.GetComponent<MusicUI>();
+            MusicInfo musicInfo = MusicInfoManager.GetMusicInfo(musicFileName + ".lrc");
+            if(musicInfo!=null)
+            {
+                musicUI.SetInfo(musicInfo.MusicName, musicInfo.SingerName, musicInfo.AlbumName);
+            }          
         }
         #endregion
         /// <summary>

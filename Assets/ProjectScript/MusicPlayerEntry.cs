@@ -10,19 +10,14 @@ namespace MusicPlayer
     public class MusicPlayerEntry : MonoBehaviour
     {
         private void Awake()
-        {           
-
-
-
-
-
+        {          
             //加载控制面板
-            if(GoLoad.Take("FarmeLockFile\\WindowRoot", out GameObject go))
+            if(GoLoad.Take(@"FarmeLockFile\WindowRoot", out GameObject go))
             {
                 WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton(go);
                 root.CreateWindow("Controller", RenderMode.ScreenSpaceOverlay, (window) => 
                 {
-                    window.CreatePanel<MusicPlayControllerPanel>("Panel\\MusicPlayControllerPanel", "ControllerPanel", EnumPanelLayer.TOP, (panel) => 
+                    window.CreatePanel<MusicPlayControllerPanel>(@"Panel\MusicPlayControllerPanel", "ControllerPanel", EnumPanelLayer.TOP, (panel) => 
                     {
                         Debuger.Log("加载控制面板成功");
                     });
@@ -31,12 +26,7 @@ namespace MusicPlayer
                     //    Debuger.Log("加载界面面板成功");
                     //});
                 });                
-            }
-            
-
-            
-
-
+            }                  
         }
     }
 }

@@ -85,15 +85,16 @@
     <Compile Include="Assets\Frame\Load\GoReusePool.cs" />
     <Compile Include="Assets\Frame\Load\ResourcesLoad.cs" />
     <Compile Include="Assets\Frame\Load\SceneLoad.cs" />
-    <Compile Include="Assets\Frame\Net\DownLoad.cs" />
     <Compile Include="Assets\Frame\Net\WebDownloadTool.cs" />
+    <Compile Include="Assets\Frame\Plugins\Audio\MP3Tool.cs" />
     <Compile Include="Assets\Frame\UI\BasePanel.cs" />
     <Compile Include="Assets\Frame\UI\StandardWindow.cs" />
     <Compile Include="Assets\Frame\UI\WindowRoot.cs" />
     <Compile Include="Assets\LrcInfo.cs" />
-    <Compile Include="Assets\NAudioPlayer.cs" />
     <Compile Include="Assets\ProjectScript\Manager\MusicDataManager.cs" />
+    <Compile Include="Assets\ProjectScript\Manager\MusicInfoManager.cs" />
     <Compile Include="Assets\ProjectScript\MusicData.cs" />
+    <Compile Include="Assets\ProjectScript\MusicInfo.cs" />
     <Compile Include="Assets\ProjectScript\MusicPlayerConfigInfo.cs" />
     <Compile Include="Assets\ProjectScript\MusicPlayerData.cs" />
     <Compile Include="Assets\ProjectScript\MusicPlayerEntry.cs" />
@@ -104,7 +105,6 @@
     <Compile Include="Assets\ProjectScript\Panel\MusicPlayInterfacePanel.cs" />
     <Compile Include="Assets\ProjectScript\Panel\MusicPlaySetPanel.cs" />
     <Compile Include="Assets\Test.cs" />
-    <Compile Include="Assets\WAV.cs" />
     <Compile Include="Assets\WindowAPI.cs" />
     <None Include="Assets\Frame\Plugins\Log\Debuger.xml" />
     <Reference Include="Unity.Timeline.Editor">
@@ -315,7 +315,7 @@
       <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Frame/Plugins/Log/Debuger.dll</HintPath>
     </Reference>
     <Reference Include="NAudio">
-      <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Plugins/NAudio.dll</HintPath>
+      <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Frame/Plugins/Audio/NAudio.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>S:/Unity Pro 2019.3.7f1/Unity/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>

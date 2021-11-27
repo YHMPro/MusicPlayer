@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Farme.Tool;
 using System;
+using MusicPlayer.Manager;
 namespace MusicPlayer
 {
     [Serializable]
@@ -32,8 +33,13 @@ namespace MusicPlayer
                     m_MusicFilePath = value;
                     //依照此路径进行查找
                     m_MusicFileNames=MusicPlayerTool.GetAllChildFileNames(m_MusicFilePath, "*.mp3");
-                    m_MusicFileNum = m_MusicFileNames.Length;
+                    m_MusicFileNum = MusicFileNames.Length;
                     Debuger.Log("文件数量为:" + m_MusicFileNum);
+                    MusicInfoManager.ClearData();
+                    foreach(var fileName in MusicFileNames)
+                    {
+                        MusicInfoManager.AddMusicInfo(fileName + ".lrc");
+                    }
                 }
             }
         }

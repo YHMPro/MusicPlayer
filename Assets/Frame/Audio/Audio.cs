@@ -281,16 +281,6 @@ namespace Farme.Audio
             }
         }
         /// <summary>
-        /// 获取音效频谱数据
-        /// </summary>
-        /// <param name="samples">要填充音频样本的数组。 它的长度一定是2的幂。  </param>
-        /// <param name="channel">取样的通道。</param>
-        /// <param name="window">采样时使用的fftwwindow类型。</param>
-        public void GetSpectrumData(float[] samples, int channel, FFTWindow window)
-        {
-            m_As.GetSpectrumData(samples, channel, window);
-        }
-        /// <summary>
         /// 播放
         /// </summary>
         public void Play()

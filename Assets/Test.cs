@@ -16,7 +16,7 @@ public class Test : MonoBehaviour
         //  {
 
 
-        WebDownloadTool.WebDownLoadMp3(path + "M2M - Pretty Boy.mp3", (clip) =>
+        WebDownloadTool.WebDownLoadAudioClipMP3(path + "M2M - Pretty Boy.mp3", (clip) =>
           {
               Audio audio = AudioManager.ApplyForAudio();
               audio.Loop = true;

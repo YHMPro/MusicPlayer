@@ -32,11 +32,15 @@ namespace MusicPlayer
 
         private void Awake()
         {
-            
+            WebDownloadTool.WebDownloadTexture(@"F:\YHM\项目\景德镇陶瓷拉胚项目\协作记录\模型协作\负责人(祖)\2021.11.26\陶艺拉坯姿势需求\姿势截图\1.png", (texture2D) =>
+            {
+                img.sprite = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), Vector2.zero);
+
+            });
             //m_audio = AudioManager.ApplyForAudio();
             //m_audio.AbleRecycle = false;
-            samples = new float[64];
-            InvokeRepeating("Con", 0, 0.2f);
+            //samples = new float[64];
+            ////InvokeRepeating("Con", 0, 0.2f);
         }
 
         public void SetURLEnd()
@@ -48,20 +52,20 @@ namespace MusicPlayer
         string path = "C:\\Users\\XiaoHeTao\\Desktop\\Music\\";
         public void PlayEvent()
         {
-            if(audio!=null)
-            {
-                audio.Clip.UnloadAudioData();
-            }
-            WebDownloadTool.WebDownLoadMp3(path + MP3path+".mp3", (clip) =>
-            {
-                if (audio == null)
-                {
-                    audio = AudioManager.ApplyForAudio();
-                    audio.Loop = true;
-                }
-                audio.Clip = clip;
-                audio.Play();
-            });
+            //if(audio!=null)
+            //{
+            //    audio.Clip.UnloadAudioData();
+            //}
+            //WebDownloadTool.WebDownLoadAudioClipMP3(path + MP3path+".mp3", (clip) =>
+            //{
+            //    if (audio == null)
+            //    {
+            //        audio = AudioManager.ApplyForAudio();
+            //        audio.Loop = true;
+            //    }
+            //    audio.Clip = clip;
+            //    audio.Play();
+            //});
             //NotMonoFactory<MusicData>.GetInstance().InitMusicData(MP3path, Lrcpath, (musicData) =>
             //{
             //    img.sprite = Sprite.Create(musicData.Cover, new Rect(0, 0, musicData.Cover.width, musicData.Cover.height), Vector2.zero);
@@ -159,14 +163,14 @@ namespace MusicPlayer
         {
             if(audio!=null)
             {
-                audio.GetSpectrumData(samples, 0, FFTWindow.BlackmanHarris);
-                float num = 0;
-                foreach(var value in samples)
-                {
-                    num += value;
-                }
-                img1.localScale = Vector3.one * num*10;
-                img2.localScale = Vector3.one * num*10;
+                //audio.GetSpectrumData(samples, 0, FFTWindow.BlackmanHarris);
+                //float num = 0;
+                //foreach(var value in samples)
+                //{
+                //    num += value;
+                //}
+                //img1.localScale = Vector3.one * num*10;
+                //img2.localScale = Vector3.one * num*10;
 
             }
         }

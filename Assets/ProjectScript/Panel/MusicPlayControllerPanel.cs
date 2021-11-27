@@ -114,7 +114,7 @@ namespace MusicPlayer.Panel
                     MusicPlaySetPanel panel = window.GetPanel<MusicPlaySetPanel>("SetPanel");
                     if (panel == null)
                     {
-                        window.CreatePanel<MusicPlaySetPanel>("Panel\\MusicPlaySetPanel", "SetPanel", EnumPanelLayer.SYSTEM, (instance) =>
+                        window.CreatePanel<MusicPlaySetPanel>(@"Panel\MusicPlaySetPanel", "SetPanel", EnumPanelLayer.SYSTEM, (instance) =>
                         {
                             Debuger.Log("创建设置面板成功");
                             instance.SetState(EnumPanelState.Show);
@@ -142,7 +142,7 @@ namespace MusicPlayer.Panel
                     MusicListPanel panel = window.GetPanel<MusicListPanel>("MusicListPanel");
                     if (panel == null)
                     {
-                        window.CreatePanel<MusicListPanel>("Panel\\MusicListPanel", "MusicListPanel", EnumPanelLayer.BOTTOM, (instance) =>
+                        window.CreatePanel<MusicListPanel>(@"Panel\MusicListPanel", "MusicListPanel", EnumPanelLayer.BOTTOM, (instance) =>
                         {
                             Debuger.Log("创建音乐列表面板成功");
                             instance.SetState(EnumPanelState.Show);
