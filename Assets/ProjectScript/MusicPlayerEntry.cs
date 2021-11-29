@@ -28,5 +28,21 @@ namespace MusicPlayer
                 });                
             }                  
         }
+
+
+
+        public void Update()
+        {
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                MusicPlayerData.MusicFilePath = @"C:\Users\XiaoHeTao\Desktop\Music";
+
+
+                foreach(var name in MusicPlayerData.MusicFileNames)
+                {
+                    Debuger.Log(name);
+                }
+            }
+        }
     }
 }

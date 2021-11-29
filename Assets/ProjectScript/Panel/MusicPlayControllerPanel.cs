@@ -13,7 +13,7 @@ namespace MusicPlayer.Panel
     /// </summary>
     public class MusicPlayControllerPanel : BasePanel
     {
-
+         
         protected override void Awake()
         {
             base.Awake();
@@ -85,6 +85,7 @@ namespace MusicPlayer.Panel
         private void MusicPlayAndPauseEvent()
         {
             Debuger.Log("触发播放或暂停事件");
+            
         }
 
         private void MusicNextEvent()

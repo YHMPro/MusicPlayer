@@ -91,6 +91,7 @@
     <Compile Include="Assets\Frame\UI\StandardWindow.cs" />
     <Compile Include="Assets\Frame\UI\WindowRoot.cs" />
     <Compile Include="Assets\LrcInfo.cs" />
+    <Compile Include="Assets\ProjectScript\Manager\MusicController.cs" />
     <Compile Include="Assets\ProjectScript\Manager\MusicDataManager.cs" />
     <Compile Include="Assets\ProjectScript\Manager\MusicInfoManager.cs" />
     <Compile Include="Assets\ProjectScript\MusicData.cs" />
@@ -311,11 +312,11 @@
     <Reference Include="UnityEngine.XRModule">
       <HintPath>S:/Unity Pro 2019.3.7f1/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
     </Reference>
-    <Reference Include="Debuger">
-      <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Frame/Plugins/Log/Debuger.dll</HintPath>
-    </Reference>
     <Reference Include="NAudio">
       <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Frame/Plugins/Audio/NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="Debuger">
+      <HintPath>S:/Unity Pro 2019.3.7f1/MyGitProject/MusicPlayer/Assets/Frame/Plugins/Log/Debuger.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>S:/Unity Pro 2019.3.7f1/Unity/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
