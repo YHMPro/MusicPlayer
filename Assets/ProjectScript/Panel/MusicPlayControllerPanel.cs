@@ -6,6 +6,7 @@ using Farme;
 using Farme.UI;
 using Farme.Tool;
 using UnityEngine.Events;
+using MusicPlayer.Manager;
 namespace MusicPlayer.Panel
 {
     /// <summary>

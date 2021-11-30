@@ -39,7 +39,7 @@ namespace MusicPlayer.Manager
                 m_MusicAudioTo.Loop = false;//非循环
                 if (AudioMixerManager.GetAudioMixerGroup("BackGround", out var group))
                 {
-                    m_MusicAudioFrom.Group = group;
+                    m_MusicAudioTo.Group = group;
                 }
             }
             if (m_ButtonAudio == null)
@@ -49,40 +49,56 @@ namespace MusicPlayer.Manager
                 m_ButtonAudio.Loop = false;//非循环
                 if (AudioMixerManager.GetAudioMixerGroup("Button", out var group))
                 {
-                    m_MusicAudioFrom.Group = group;
+                    m_ButtonAudio.Group = group;
                 }
             }
         }
 
         public static void MusicPlay( AudioClip clip)
-        {
-            m_MusicAudioFrom.Clip = clip;
-            if (m_MusicAudioFrom.Clip != null && m_MusicAudioTo.Clip != null)
+        {         
+            if (m_MusicAudioFrom.Clip != null)
             {
                 if (IsFrom_To)
                 {
+                    m_MusicAudioTo.Clip = clip;
                     AudioManager.ExcessPlay(m_MusicAudioFrom, m_MusicAudioTo, 0.5f);
                 }
                 else
                 {
+                    m_MusicAudioFrom.Clip = clip;
                     AudioManager.ExcessPlay(m_MusicAudioTo, m_MusicAudioFrom, 0.5f);
                 }
-
+                IsFrom_To = !IsFrom_To;
             }
             else
-            {
-                //m_MusicAudioFrom.Play(0.5f)
+            {              
+                m_MusicAudioFrom.Clip = clip;
+                m_MusicAudioFrom.Play();
             }
         }
 
         public static void MusicPause()
         {
-
+            if(IsFrom_To)
+            {
+                m_MusicAudioTo.Pause();
+            }
+            else
+            {
+                m_MusicAudioFrom.Pause();
+            }
         }
 
         public static void MusicRePlay()
         {
-
+            if (IsFrom_To)
+            {
+                m_MusicAudioTo.RePlay();
+            }
+            else
+            {
+                m_MusicAudioFrom.RePlay();
+            }
         }
 
 

@@ -5,12 +5,14 @@ using Farme.UI;
 using Farme;
 using MusicPlayer.Panel;
 using Farme.Tool;
+using MusicPlayer.Manager;
 namespace MusicPlayer
 {
     public class MusicPlayerEntry : MonoBehaviour
     {
         private void Awake()
-        {          
+        {
+            MusicController.Init();
             //加载控制面板
             if(GoLoad.Take(@"FarmeLockFile\WindowRoot", out GameObject go))
             {

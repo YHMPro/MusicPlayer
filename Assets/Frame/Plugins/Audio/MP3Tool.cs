@@ -20,7 +20,7 @@ namespace Farme.Tool
                 using (waveStream = WaveFormatConversionStream.CreatePcmStream(mp3audio))
                 {
                     WAV wav = new WAV(AudioMemStream(waveStream).ToArray());
-                    AudioClip audioClip = AudioClip.Create("Music", wav.SampleCount, 1, wav.Frequency, false);
+                    AudioClip audioClip = AudioClip.Create("Music", wav.SampleCount, 1, wav.Frequency, false);                 
                     audioClip.SetData(wav.LeftChannel, 0);
                     callback?.Invoke(audioClip);
                 }
@@ -34,9 +34,11 @@ namespace Farme.Tool
                 byte[] bytes = new byte[waveStream.Length];
                 waveStream.Position = 0;
                 waveStream.Read(bytes, 0, Convert.ToInt32(waveStream.Length));
+                Debuger.Log("音频长度:" + bytes.Length);
                 waveFileWriter.Write(bytes, 0, bytes.Length);
                 waveFileWriter.Flush();
             }
+           
             return outputStream;
         }
     }

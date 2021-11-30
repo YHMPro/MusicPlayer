@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Farme;
 using UnityEngine.UI;
+using Farme.Net;
+using MusicPlayer.Manager;
 namespace MusicPlayer
 {
     /// <summary>
@@ -87,7 +89,12 @@ namespace MusicPlayer
                 if (GetComponent("TitleContent", out Text contentText))
                 {
                     Debug.Log("播放>" + contentText.text+ "<音乐");
-                }                
+                }
+                //MusicPlayerData.MusicFilePath
+                WebDownloadTool.WebDownLoadAudioClipMP3(MusicPlayerData.MusicFilePath + @"\" + MusicPlayerData.MusicFileNames[int.Parse(m_MusicIndex.text)-1]+".mp3",(audio)=> 
+                {
+                    MusicController.MusicPlay(audio);
+                });
                 m_SingleClick = false;//直接重置为未点击
             }      
         }  

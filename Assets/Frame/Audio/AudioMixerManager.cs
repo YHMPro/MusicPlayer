@@ -10,7 +10,7 @@ namespace Farme.Audio
     public class AudioMixerManager
     {
         #region 字段
-        private static string m_MainAudioMixerPath = "YHMFarmeLockFile/AudioMixer";
+        private static string m_MainAudioMixerPath = "AudioMixer/MusicPlayer";
         private static AudioMixer m_MainAudioMixer = null;
         private static Dictionary<string, AudioMixerGroup> m_AudioMixerGroupDic = null;
         private static AudioMixerGroup m_NowOperationAudioMixerGroup = null;
