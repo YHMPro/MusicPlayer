@@ -449,7 +449,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 140
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
@@ -1180,7 +1180,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 3402247407364489155}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.979592
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

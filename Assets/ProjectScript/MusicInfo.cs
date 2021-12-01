@@ -4,7 +4,7 @@ using System.IO;
 using Farme.Net;
 using Farme.Extend;
 using UnityEngine;
-
+using UnityEngine.Events;
 namespace MusicPlayer
 {
     /// <summary>
@@ -35,6 +35,16 @@ namespace MusicPlayer
         private Dictionary<float, string> m_LyricDic = null;
         #endregion
         #region 属性
+        /// <summary>
+        /// 封面
+        /// </summary>
+        public Sprite Album
+        {
+            get
+            {
+                return m_Sp;
+            }
+        }
         /// <summary>
         /// 歌曲名称
         /// </summary>
@@ -68,13 +78,15 @@ namespace MusicPlayer
         #endregion
 
         /// <summary>
-        /// 加载基础信息(列表显示时加载)  
+        /// 加载基础信息
         /// </summary>
-        public void LoadBaseInfo(string musicFilePath)
+        /// <param name="musicFileName">音乐文件名(不含后缀名)</param>
+        public void LoadBaseInfo(string musicFileName)
         {
+            string musicFilePath = MusicPlayerData.MusicFilePath + @"\" + musicFileName + MusicPlayerData.LyrlcFileSuffix;
             if (!File.Exists(musicFilePath))
             {
-                FromFilePathExtractBaseInfo(musicFilePath);
+                FromFilePathExtractBaseInfo(musicFileName);
                 return; }
             WebDownloadTool.WebDownloadText(musicFilePath, (info) =>
             {
@@ -103,7 +115,7 @@ namespace MusicPlayer
                         }
                     }
                 }
-                FromFilePathExtractBaseInfo(musicFilePath);
+                FromFilePathExtractBaseInfo(musicFileName);
             });
         }
         /// <summary>
@@ -114,23 +126,42 @@ namespace MusicPlayer
            
         }
         /// <summary>
+        /// 加载封面
+        /// </summary>
+        /// <param name="musicFileName">音乐文件名称(不含后缀名，之后可能会将.mp3文件中的封面保存至本地在进行读取)</param>
+        /// <param name="callback">加载完成后的回调</param>
+        public void LoadAlbum(string musicFileName,UnityAction callback)
+        {
+            string musicFilePath = MusicPlayerData.MusicFilePath + @"\" + musicFileName + MusicPlayerData.MusicFileSuffix;
+            if (!File.Exists(musicFilePath))
+            {
+                callback?.Invoke();
+                return;
+            }
+            if(m_Sp!=null)
+            {
+                callback?.Invoke();
+                return;
+            }
+            MusicPlayerTool.GetAlbumCover(musicFilePath, (texture2D) =>
+            {
+                m_Sp = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), Vector2.zero);
+                callback?.Invoke();
+            });
+        }
+        /// <summary>
         /// 从文件路径中提取基础信息
         /// </summary>
-        /// <param name="musicFilePath"></param>
-        private void FromFilePathExtractBaseInfo(string musicFilePath)
+        /// <param name="musicFileName">音乐文件名称(不含后缀名)</param>
+        private void FromFilePathExtractBaseInfo(string musicFileName)
         {
             if (string.IsNullOrEmpty(m_MusicName))
             {
-                //从路径中提取歌曲名称与歌手名称  (不含后缀名称)
-                string fileName = musicFilePath.AssignCharExtract('\\').Split('.')[0];
-                if (!string.IsNullOrEmpty(fileName))
+                string[] names = musicFileName.Split('-');
+                m_MusicName = names[0];
+                if (names.Length > 1)
                 {
-                    string[] names = fileName.Split('-');
-                    m_MusicName = names[0];
-                    if (names.Length > 1)
-                    {
-                        m_SingerName = names[1];
-                    }
+                    m_SingerName = names[1];
                 }
             }
         }

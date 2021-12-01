@@ -4,6 +4,8 @@ using UnityEngine;
 using Farme.Tool;
 using System;
 using MusicPlayer.Manager;
+using Farme.Net;
+
 namespace MusicPlayer
 {
     [Serializable]
@@ -12,6 +14,26 @@ namespace MusicPlayer
     /// </summary>
     public class MusicPlayerData 
     {
+        /// <summary>
+        /// 音乐文件后缀
+        /// </summary>
+        public static string MusicFileSuffix
+        {
+            get
+            {
+                return ".mp3";
+            }
+        }
+        /// <summary>
+        /// 歌词文件后缀
+        /// </summary>
+        public static string LyrlcFileSuffix
+        {
+            get
+            {
+                return ".lrc";
+            }
+        }
         /// <summary>
         /// 音乐文件夹路径
         /// </summary>
@@ -32,13 +54,13 @@ namespace MusicPlayer
                     Debuger.Log("音乐文件路径刷新");
                     m_MusicFilePath = value;
                     //依照此路径进行查找
-                    m_MusicFileNames=MusicPlayerTool.GetAllChildFileNames(m_MusicFilePath, "*.mp3");
+                    m_MusicFileNames=MusicPlayerTool.GetAllChildFileNames(m_MusicFilePath,"*"+MusicFileSuffix);
                     m_MusicFileNum = MusicFileNames.Length;
                     Debuger.Log("文件数量为:" + m_MusicFileNum);
                     MusicInfoManager.ClearData();
                     foreach(var fileName in MusicFileNames)
                     {
-                        MusicInfoManager.AddMusicInfo(fileName + ".lrc");
+                        MusicInfoManager.AddMusicInfo(fileName);
                     }
                 }
             }
@@ -48,7 +70,7 @@ namespace MusicPlayer
         /// </summary>
         private static string[] m_MusicFileNames = null;
         /// <summary>
-        /// 音乐文件名称数组
+        /// 音乐文件名称数组(不含文件后缀)
         /// </summary>
         public static string[] MusicFileNames
         {
@@ -72,11 +94,44 @@ namespace MusicPlayer
                 return m_MusicFileNum;
             }
         }
-
-
-
-        
-
-       
+        /// <summary>
+        /// 当前播放的音乐索引
+        /// </summary>
+        private static int m_NowPlayMusicIndex = -1;
+        /// <summary>
+        /// 当前播放的音乐索引
+        /// 0~检测到的文件最大数量
+        /// </summary>
+        public static int NowPlayMusicIndex
+        {
+            get
+            {
+                return m_NowPlayMusicIndex;
+            }
+            set
+            {
+                m_NowPlayMusicIndex = Mathf.Clamp(value,0, m_MusicFileNum-1);
+            }
+        }      
+        /// <summary>
+        /// 当前播放的歌曲是否为第一首
+        /// </summary>
+        public static bool NowPlayMusicIsStart
+        {
+            get
+            {
+                return m_NowPlayMusicIndex > 0;
+            }
+        }
+        /// <summary>
+        /// 当前播放的歌曲是否为最后一首
+        /// </summary>
+        public static bool NowPlayMusicIsEnd
+        {
+            get
+            {
+                return m_NowPlayMusicIndex < m_MusicFileNum - 1;
+            }
+        }
     }
 }

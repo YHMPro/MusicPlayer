@@ -43,11 +43,7 @@ namespace MusicPlayer.Panel
         /// <summary>
         /// 音乐UI列表
         /// </summary>
-        private List<RectTransform> m_MusicLi = new List<RectTransform>();        
-        /// <summary>
-        /// 用于记录音乐列表中的位置信息  在每次关闭时记录一次(本地坐标)
-        /// </summary>
-        private Vector2[] m_MusicPoss = null;
+        private List<RectTransform> m_MusicLi = new List<RectTransform>();              
         /// <summary>
         /// 滚动矩形
         /// </summary>
@@ -112,27 +108,12 @@ namespace MusicPlayer.Panel
         protected override void OnEnable()
         {
             base.OnEnable();
-            //if (m_MusicPoss != null)
-            //{
-            //    MonoSingletonFactory<ShareMono>.GetSingleton().DelayAction(0.05f, () =>
-            //    {
-            //        for (int index = 0; index < m_MusicLi.Count; index++)
-            //        {
-            //            m_MusicLi[index].localPosition = m_MusicPoss[index];
-            //        }
-            //    });
-            //}
+            
         }
         
         protected override void OnDisable()
         {
-            base.OnDisable();
-            //m_MusicPoss = new Vector2[m_MusicLi.Count];
-            //for(int index=0;index< m_MusicPoss.Length;index++)
-            //{
-            //    m_MusicPoss[index] = m_MusicLi[index].localPosition;
-            //}
-          
+            base.OnDisable();                
         }
         /// <summary>
         /// 音乐列表上一帧的位置(世界坐标)
@@ -168,11 +149,10 @@ namespace MusicPlayer.Panel
                         //设置位置信息
                         musicUI.rectTransform.localPosition = new Vector3(951.55f, -70 + (index * -120), 0);
                         //设置信息   通过歌词文件进行获取
-                        string musicFileName = MusicPlayerData.MusicFileNames[index];//提取音乐文件名称  
-                        MusicInfo musicInfo = MusicInfoManager.GetMusicInfo(musicFileName + ".lrc");
+                        MusicInfo musicInfo = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[index]);
                         if (musicInfo != null)
                         {
-                            musicUI.SetInfo(index+1,musicInfo.MusicName, musicInfo.SingerName, musicInfo.AlbumName);
+                            musicUI.SetInfo(index,musicInfo.MusicName, musicInfo.SingerName, musicInfo.AlbumName);
                         }
                         m_MusicLi.Add(musicUI.rectTransform);
                     }                  
@@ -183,13 +163,17 @@ namespace MusicPlayer.Panel
                 m_MusicLastPosY = m_MusicList.position.y;
             }
         }
-
         /// <summary>
         /// 刷新列表
         /// </summary>
-        public void RefreshList()
+        public void RefreshPanel()
         {
-
+            #region 更新音乐UI状态
+            foreach (var tran in m_MusicLi)
+            {
+                tran.GetComponent<MusicUI>().RefreshState();
+            }
+            #endregion
         }
         /// <summary>
         /// 音乐列表滑动事件 
@@ -305,10 +289,10 @@ namespace MusicPlayer.Panel
             //Debuger.LogWarning("更新歌曲:" + musicFileName + "歌曲索引:" + (isTop ? m_MusicIndex : m_MusicIndex + m_MusicMax - 1));
             #endregion              
             MusicUI musicUI = isTop ? m_Top.GetComponent<MusicUI>() : m_Bottom.GetComponent<MusicUI>();
-            MusicInfo musicInfo = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[GetMusicIndex(isTop)] + ".lrc");
+            MusicInfo musicInfo = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[GetMusicIndex(isTop)]);
             if (musicInfo != null)
             {
-                musicUI.SetInfo(GetMusicIndex(isTop)+1, musicInfo.MusicName, musicInfo.SingerName, musicInfo.AlbumName);
+                musicUI.SetInfo(GetMusicIndex(isTop), musicInfo.MusicName, musicInfo.SingerName, musicInfo.AlbumName);
             }     
         }
         #endregion

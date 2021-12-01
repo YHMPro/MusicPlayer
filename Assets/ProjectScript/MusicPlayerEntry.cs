@@ -39,11 +39,10 @@ namespace MusicPlayer
             {
                 MusicPlayerData.MusicFilePath = @"C:\Users\XiaoHeTao\Desktop\Music";
 
-
-                foreach(var name in MusicPlayerData.MusicFileNames)
-                {
-                    Debuger.Log(name);
-                }
+                //foreach(var name in MusicPlayerData.MusicFileNames)
+                //{
+                //    Debuger.Log(name);
+                //}
             }
         }
     }

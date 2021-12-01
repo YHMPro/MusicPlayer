@@ -6,6 +6,8 @@ using Farme.Tool;
 using System;
 using System.Text;
 using UnityEngine.Events;
+using Farme.Net;
+using MusicPlayer.Manager;
 
 namespace MusicPlayer
 {
@@ -207,5 +209,6 @@ namespace MusicPlayer
         {
             return target.Replace(" ", "");
         }
+        
     }
 }

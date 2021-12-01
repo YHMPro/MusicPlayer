@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Farme.Audio;
+using Farme.Net;
+using Farme.Extend;
+using Farme;
+using Farme.UI;
+using MusicPlayer.Panel;
+
 namespace MusicPlayer.Manager
 {
     /// <summary>
@@ -10,7 +16,7 @@ namespace MusicPlayer.Manager
     public class MusicController
     {
         #region 用于形成过度音效播放的效果
-        private static bool IsFrom_To = true;
+        private static bool IsFrom_To = false;
         private static Audio m_MusicAudioFrom = null;
         private static Audio m_MusicAudioTo = null;
         #endregion
@@ -53,30 +59,95 @@ namespace MusicPlayer.Manager
                 }
             }
         }
-
-        public static void MusicPlay( AudioClip clip)
-        {         
-            if (m_MusicAudioFrom.Clip != null)
+        /// <summary>
+        /// 加载并播放(含渐变)
+        /// </summary>
+        public static void MusicPlay()
+        {
+            WebDownloadTool.WebDownLoadAudioClipMP3(MusicPlayerData.MusicFilePath + @"\" + MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex] + MusicPlayerData.MusicFileSuffix, (clip) =>
             {
-                if (IsFrom_To)
+                if(clip==null)
                 {
-                    m_MusicAudioTo.Clip = clip;
-                    AudioManager.ExcessPlay(m_MusicAudioFrom, m_MusicAudioTo, 0.5f);
+                    return;
+                }                            
+                if (m_MusicAudioFrom.Clip != null)
+                {
+                    IsFrom_To = !IsFrom_To;
+                    if (IsFrom_To)
+                    {
+                        m_MusicAudioTo.Clip = clip;
+                        AudioManager.ExcessPlay(m_MusicAudioFrom, m_MusicAudioTo, 1f, 0.5f);
+                    }
+                    else
+                    {
+                        m_MusicAudioFrom.Clip = clip;
+                        AudioManager.ExcessPlay(m_MusicAudioTo, m_MusicAudioFrom, 1f, 0.5f);
+                    }                 
                 }
                 else
                 {
                     m_MusicAudioFrom.Clip = clip;
-                    AudioManager.ExcessPlay(m_MusicAudioTo, m_MusicAudioFrom, 0.5f);
+                    m_MusicAudioFrom.Play();
                 }
-                IsFrom_To = !IsFrom_To;
+                RefreshListPanel();
+                //加载封面与歌词
+                MusicInfo info = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex]);
+                if (info != null)
+                {
+                    info.LoadAlbum(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex],() =>
+                    {
+                        RefreshControllerPanel();
+                    });
+                    info.LoadLyriInfo();//待
+                }
+            });                            
+        }
+
+        /// <summary>
+        /// 播放或暂停
+        /// </summary>
+        public static void MusicPlayOrPause()
+        {
+            if (IsFrom_To)
+            {
+                if (m_MusicAudioTo.IsPause)
+                {
+                    m_MusicAudioTo.Play();
+                }
+                else
+                {
+                    m_MusicAudioTo.Pause();
+                }
             }
             else
-            {              
-                m_MusicAudioFrom.Clip = clip;
+            {
+                if (m_MusicAudioFrom.IsPause)
+                {
+                    m_MusicAudioFrom.Play();
+                }
+                else
+                {
+                    m_MusicAudioFrom.Pause();
+                }                    
+            }
+        }
+        /// <summary>
+        /// 继续播放
+        /// </summary>
+        public static void MusicContinue()
+        {
+            if (IsFrom_To)
+            {
+                m_MusicAudioTo.Play();
+            }
+            else
+            {
                 m_MusicAudioFrom.Play();
             }
         }
-
+        /// <summary>
+        /// 暂停
+        /// </summary>
         public static void MusicPause()
         {
             if(IsFrom_To)
@@ -88,7 +159,9 @@ namespace MusicPlayer.Manager
                 m_MusicAudioFrom.Pause();
             }
         }
-
+        /// <summary>
+        /// 重播
+        /// </summary>
         public static void MusicRePlay()
         {
             if (IsFrom_To)
@@ -100,7 +173,44 @@ namespace MusicPlayer.Manager
                 m_MusicAudioFrom.RePlay();
             }
         }
+        /// <summary>
+        /// 刷新控制面板
+        /// </summary>
+        public static void RefreshControllerPanel()
+        {
+            if (MonoSingletonFactory<WindowRoot>.SingletonExist)
+            {
+                WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
+                StandardWindow window = root.GetWindow("Controller");
+                if (window != null)
+                {
+                    MusicPlayControllerPanel panel = window.GetPanel<MusicPlayControllerPanel>("ControllerPanel");
+                    if (panel != null)
+                    {
+                        panel.RefreshPanel();//刷新控制面板
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// 刷新列表面板
+        /// </summary>
+        public static void RefreshListPanel()
+        {
+            if (MonoSingletonFactory<WindowRoot>.SingletonExist)
+            {
+                WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
+                StandardWindow window = root.GetWindow("Controller");
+                if (window != null)
+                {
+                    MusicListPanel panel = window.GetPanel<MusicListPanel>("MusicListPanel");
+                    if (panel != null)
+                    {
+                        panel.RefreshPanel();//刷新音乐列表面板
+                    }
+                }
+            }
 
-
+        }
     }
 }

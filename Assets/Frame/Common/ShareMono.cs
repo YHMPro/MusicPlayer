@@ -34,8 +34,7 @@ namespace Farme
         /// </summary>
         private void Update()
         {
-            m_Callback?.Invoke();
-            
+            m_Callback?.Invoke();         
         }
         /// <summary>
         /// 延迟更新
