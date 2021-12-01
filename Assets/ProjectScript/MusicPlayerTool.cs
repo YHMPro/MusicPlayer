@@ -8,7 +8,7 @@ using System.Text;
 using UnityEngine.Events;
 using Farme.Net;
 using MusicPlayer.Manager;
-
+using System.Text.RegularExpressions;
 namespace MusicPlayer
 {
     public class MusicPlayerTool 
@@ -209,6 +209,14 @@ namespace MusicPlayer
         {
             return target.Replace(" ", "");
         }
-        
+        /// <summary>
+        /// 匹配的字符是否为歌词
+        /// </summary>
+        /// <param name="content">内容</param>
+        /// <returns>是否是</returns>
+        public static bool MatchWord(string content)
+        {
+            return Regex.IsMatch(content, "[0-9][0-9].[0-9][0-9].[0-9][0-9]");
+        }
     }
 }

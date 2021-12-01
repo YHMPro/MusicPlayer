@@ -5,6 +5,9 @@ using Farme.Net;
 using Farme.Extend;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Text.RegularExpressions;
+using System;
+
 namespace MusicPlayer
 {
     /// <summary>
@@ -32,9 +35,19 @@ namespace MusicPlayer
         /// <summary>
         /// 歌曲歌词
         /// </summary>
-        private Dictionary<float, string> m_LyricDic = null;
+        private Dictionary<double, string> m_LyricDic = null;
         #endregion
         #region 属性
+        /// <summary>
+        /// 歌曲歌词
+        /// </summary>
+        public Dictionary<double,string> LyricDic
+        {
+            get
+            {
+                return m_LyricDic;
+            }
+        }
         /// <summary>
         /// 封面
         /// </summary>
@@ -120,10 +133,45 @@ namespace MusicPlayer
         }
         /// <summary>
         /// 加载歌词信息(播放歌曲时加载)
+        /// <param name="musicFileName">音乐文件名(不含后缀名)</param>
         /// </summary>
-        public void LoadLyriInfo()
+        public void LoadLyriInfo(string musicFileName,UnityAction callback)
         {
-           
+            string musicFilePath = MusicPlayerData.MusicFilePath + @"\" + musicFileName + MusicPlayerData.LyrlcFileSuffix;
+            if (!File.Exists(musicFilePath))
+            {
+                m_LyricDic = new Dictionary<double, string>();
+                m_LyricDic.Add(0, "没有找到歌词");
+                callback?.Invoke();
+                return;
+            }
+            m_LyricDic = new Dictionary<double, string>();
+            WebDownloadTool.WebDownloadText(musicFilePath, (info) =>
+            {
+                if (info != null)
+                {
+                    using (StringReader sr = new StringReader(info))//创建字符串读取工具实例
+                    {
+                        string lrcLine = null;
+                        while ((lrcLine = sr.ReadLine()) != null)
+                        {
+                            if(MusicPlayerTool.MatchWord(lrcLine))
+                            {
+                                Regex regex = new Regex(@"\[([0-9.:]*)\]+(.*)", RegexOptions.Compiled);
+                                MatchCollection mc = regex.Matches(lrcLine);
+                                double time = TimeSpan.Parse("00:" + mc[0].Groups[1].Value).TotalSeconds;
+                                string word = mc[0].Groups[2].Value;
+                                m_LyricDic.Add(time, word);
+                            }                           
+                        }
+                    }
+                    if(m_LyricDic.Count==0)
+                    {
+                        m_LyricDic.Add(0, "没有歌词");
+                    }
+                    callback?.Invoke();
+                }
+            });
         }
         /// <summary>
         /// 加载封面

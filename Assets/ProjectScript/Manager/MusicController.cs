@@ -7,6 +7,7 @@ using Farme.Extend;
 using Farme;
 using Farme.UI;
 using MusicPlayer.Panel;
+using Farme.Tool;
 
 namespace MusicPlayer.Manager
 {
@@ -98,7 +99,19 @@ namespace MusicPlayer.Manager
                     {
                         RefreshControllerPanel();
                     });
-                    info.LoadLyriInfo();//待
+                    info.LoadLyriInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex],()=> 
+                    {
+                        #region 测试
+                        MusicInfo musicInfo = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex]);
+                        if (musicInfo != null)
+                        {
+                            foreach(var str in musicInfo.LyricDic.Values)
+                            {
+                                Debuger.Log(str);
+                            }                         
+                        }
+                        #endregion
+                    });
                 }
             });                            
         }

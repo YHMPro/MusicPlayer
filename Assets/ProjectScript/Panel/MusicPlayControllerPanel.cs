@@ -96,6 +96,7 @@ namespace MusicPlayer.Panel
             m_Next.interactable = MusicPlayerData.NowPlayMusicIsEnd;
             m_Last.interactable = MusicPlayerData.NowPlayMusicIsStart;
             m_MusicAlbum.transform.eulerAngles = Vector3.zero;
+            m_MusicAlbum.sprite = null;
             MusicInfo musicInfo = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex]);
             if(musicInfo!=null)
             {             
