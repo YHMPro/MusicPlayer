@@ -91,6 +91,7 @@
     <Compile Include="Assets\Frame\UI\StandardWindow.cs" />
     <Compile Include="Assets\Frame\UI\WindowRoot.cs" />
     <Compile Include="Assets\LrcInfo.cs" />
+    <Compile Include="Assets\ProjectScript\LyricUI.cs" />
     <Compile Include="Assets\ProjectScript\Manager\MusicController.cs" />
     <Compile Include="Assets\ProjectScript\Manager\MusicDataManager.cs" />
     <Compile Include="Assets\ProjectScript\Manager\MusicInfoManager.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Assets\ProjectScript\MusicPlayerTool.cs" />
     <Compile Include="Assets\ProjectScript\MusicUI.cs" />
     <Compile Include="Assets\ProjectScript\Panel\MusicListPanel.cs" />
+    <Compile Include="Assets\ProjectScript\Panel\MusicLyricPanel.cs" />
     <Compile Include="Assets\ProjectScript\Panel\MusicPlayControllerPanel.cs" />
     <Compile Include="Assets\ProjectScript\Panel\MusicPlayInterfacePanel.cs" />
     <Compile Include="Assets\ProjectScript\Panel\MusicPlaySetPanel.cs" />
