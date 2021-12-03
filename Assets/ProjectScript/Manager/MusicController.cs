@@ -92,25 +92,34 @@ namespace MusicPlayer.Manager
                 }
                 RefreshListPanel();
                 //加载封面与歌词
-                MusicInfo info = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex]);
-                if (info != null)
+                MusicPlayerData.NowPlayMusicInfo = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex]);
+                if (MusicPlayerData.NowPlayMusicInfo != null)
                 {
-                    info.LoadAlbum(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex],() =>
+                    MusicPlayerData.NowPlayMusicInfo.LoadAlbum(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex],() =>
                     {
                         RefreshControllerPanel();
                     });
-                    info.LoadLyriInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex],()=> 
-                    {
-                        #region 测试
-                        MusicInfo musicInfo = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex]);
-                        if (musicInfo != null)
+                    MusicPlayerData.NowPlayMusicInfo.LoadLyriInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex],()=> 
+                    {                     
+                        if (MonoSingletonFactory<WindowRoot>.SingletonExist)
                         {
-                            foreach(var str in musicInfo.LyricDic.Values)
+                            WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
+                            StandardWindow window = root.GetWindow("Controller");
+                            if (window != null)
                             {
-                                Debuger.Log(str);
-                            }                         
+                                MusicLyricPanel panel = window.GetPanel<MusicLyricPanel>("LyricPanel");
+                                if (panel != null)
+                                {
+                                    panel.LyricListInit();//歌词列表初始化
+                                    panel.RefreshPanel(0);//刷新音乐列表面板
+                                    MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);//歌词实时定位
+                                    m_LyricIndex = 0;//重置
+                                    m_AimTime = MusicPlayerData.NowPlayMusicInfo.TimeList[m_LyricIndex];//记录目标时间
+                                    MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, LyricLocation);//歌词实时定位
+                                }
+                            }
                         }
-                        #endregion
+                       
                     });
                 }
             });                            
@@ -126,10 +135,12 @@ namespace MusicPlayer.Manager
                 if (m_MusicAudioTo.IsPause)
                 {
                     m_MusicAudioTo.Play();
+                    MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, LyricLocation);
                 }
                 else
                 {
                     m_MusicAudioTo.Pause();
+                    MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);
                 }
             }
             else
@@ -137,41 +148,15 @@ namespace MusicPlayer.Manager
                 if (m_MusicAudioFrom.IsPause)
                 {
                     m_MusicAudioFrom.Play();
+                    MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, LyricLocation);
                 }
                 else
                 {
                     m_MusicAudioFrom.Pause();
+                    MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);
                 }                    
-            }
-        }
-        /// <summary>
-        /// 继续播放
-        /// </summary>
-        public static void MusicContinue()
-        {
-            if (IsFrom_To)
-            {
-                m_MusicAudioTo.Play();
-            }
-            else
-            {
-                m_MusicAudioFrom.Play();
-            }
-        }
-        /// <summary>
-        /// 暂停
-        /// </summary>
-        public static void MusicPause()
-        {
-            if(IsFrom_To)
-            {
-                m_MusicAudioTo.Pause();
-            }
-            else
-            {
-                m_MusicAudioFrom.Pause();
-            }
-        }
+            }           
+        }      
         /// <summary>
         /// 重播
         /// </summary>
@@ -185,6 +170,10 @@ namespace MusicPlayer.Manager
             {
                 m_MusicAudioFrom.RePlay();
             }
+            MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);
+            MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, LyricLocation);
+            m_AimTime = MusicPlayerData.NowPlayMusicInfo.TimeList[m_LyricIndex];
+            m_LyricIndex = 0;//重置
         }
         /// <summary>
         /// 刷新控制面板
@@ -216,7 +205,7 @@ namespace MusicPlayer.Manager
                 StandardWindow window = root.GetWindow("Controller");
                 if (window != null)
                 {
-                    MusicListPanel panel = window.GetPanel<MusicListPanel>("MusicListPanel");
+                    MusicListPanel panel = window.GetPanel<MusicListPanel>("ListPanel");
                     if (panel != null)
                     {
                         panel.RefreshPanel();//刷新音乐列表面板
@@ -225,5 +214,66 @@ namespace MusicPlayer.Manager
             }
 
         }
+
+        #region 歌词实时同步     
+        /// <summary>
+        /// 目标时间
+        /// </summary>
+        private static double m_AimTime = 0;
+        /// <summary>
+        /// 歌词索引
+        /// </summary>
+        private static int m_LyricIndex = 0;
+        /// <summary>
+        /// 歌词定位
+        /// </summary>
+        public static void LyricLocation()
+        {
+            if((IsFrom_To ? m_MusicAudioTo.Time : m_MusicAudioFrom.Time) >= m_AimTime)
+            {
+                Debuger.Log("歌词更新同步");
+                if (MonoSingletonFactory<WindowRoot>.SingletonExist)
+                {
+                    WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
+                    StandardWindow window = root.GetWindow("Controller");
+                    if (window != null)
+                    {
+                        MusicLyricPanel panel = window.GetPanel<MusicLyricPanel>("LyricPanel");
+                        if (panel != null)
+                        {
+                            panel.RefreshPanel(m_LyricIndex);//刷新音乐歌词面板
+                        }
+                    }
+                }
+                if (m_LyricIndex== MusicPlayerData.NowPlayMusicInfo.LyricList.Count-1)
+                {
+                    Debuger.Log("歌词已到最后一句,移除实时同步函数监听");
+                    MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);
+                    return;
+                }                
+                ++m_LyricIndex;
+                m_AimTime = MusicPlayerData.NowPlayMusicInfo.TimeList[m_LyricIndex];//刷新目标时间
+            }                
+        }
+        #endregion
+        ///// <summary>
+        ///// 刷新歌词面板
+        ///// </summary>
+        //public static void RefreshLyricPanel()
+        //{
+        //    if (MonoSingletonFactory<WindowRoot>.SingletonExist)
+        //    {
+        //        WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
+        //        StandardWindow window = root.GetWindow("Controller");
+        //        if (window != null)
+        //        {
+        //            MusicLyricPanel panel = window.GetPanel<MusicLyricPanel>("LyricPanel");
+        //            if (panel != null)
+        //            {
+        //                panel.RefreshPanel();//刷新音乐列表面板
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

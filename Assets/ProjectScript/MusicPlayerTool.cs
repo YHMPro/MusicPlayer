@@ -216,7 +216,7 @@ namespace MusicPlayer
         /// <returns>是否是</returns>
         public static bool MatchWord(string content)
         {
-            return Regex.IsMatch(content, "[0-9][0-9].[0-9][0-9].[0-9][0-9]");
+            return Regex.IsMatch(content, "[0-9][0-9]:[0-9][0-9].[0-9][0-9]");
         }
     }
 }

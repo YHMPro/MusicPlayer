@@ -143,7 +143,7 @@ namespace MusicPlayer.Panel
                 int productMusicUINum = Mathf.Clamp(musicNum, 0, m_MusicMax);
                 for (int index = 0; index < productMusicUINum; index++)
                 {
-                    if (GoLoad.Take("Music", out GameObject go, m_MusicList))
+                    if (GoLoad.Take("UI/Music", out GameObject go, m_MusicList))
                     {
                         MusicUI musicUI = go.GetComponent<MusicUI>();
                         //设置位置信息

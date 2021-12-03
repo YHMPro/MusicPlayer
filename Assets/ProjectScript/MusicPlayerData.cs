@@ -114,6 +114,41 @@ namespace MusicPlayer
             }
         }      
         /// <summary>
+        /// 当前播放音乐文件的名称(不含后缀)
+        /// </summary>
+        public static string NowPlayMusicFileName
+        {
+            get
+            {
+                if(m_MusicFileNames!=null)
+                {
+                    if (m_NowPlayMusicIndex >= 0 && m_NowPlayMusicIndex < m_MusicFileNames.Length)
+                    {
+                        return m_MusicFileNames[m_NowPlayMusicIndex];
+                    }
+                }
+                return "";
+            }
+        }
+        /// <summary>
+        /// 当前播放歌曲的信息
+        /// </summary>
+        private static MusicInfo m_NowPlayMusicInfo = null;
+        /// <summary>
+        /// 当前播放歌曲的信息
+        /// </summary>
+        public static MusicInfo NowPlayMusicInfo
+        {
+            get
+            {
+                return m_NowPlayMusicInfo;
+            }
+            set
+            {
+                m_NowPlayMusicInfo = value;
+            }
+        }
+        /// <summary>
         /// 当前播放的歌曲是否为第一首
         /// </summary>
         public static bool NowPlayMusicIsStart

@@ -164,10 +164,10 @@ namespace MusicPlayer.Panel
                 StandardWindow window = root.GetWindow("Controller");
                 if (window != null)
                 {
-                    MusicListPanel panel = window.GetPanel<MusicListPanel>("MusicListPanel");
+                    MusicListPanel panel = window.GetPanel<MusicListPanel>("ListPanel");
                     if (panel == null)
                     {
-                        window.CreatePanel<MusicListPanel>(@"Panel\MusicListPanel", "MusicListPanel", EnumPanelLayer.BOTTOM, (instance) =>
+                        window.CreatePanel<MusicListPanel>(@"Panel\MusicListPanel", "ListPanel", EnumPanelLayer.MIDDLE, (instance) =>
                         {
                             Debuger.Log("创建音乐列表面板成功");
                             instance.SetState(EnumPanelState.Show);

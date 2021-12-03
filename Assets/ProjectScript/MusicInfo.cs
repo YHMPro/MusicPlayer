@@ -33,21 +33,36 @@ namespace MusicPlayer
         /// </summary>
         private string m_AlbumName = "";
         /// <summary>
-        /// 歌曲歌词
+        /// 歌词时间
         /// </summary>
-        private Dictionary<double, string> m_LyricDic = null;
+        private List<double> m_TimeList = null;
+        /// <summary>
+        /// 歌词内容
+        /// </summary>
+        private List<string> m_LyricList = null;       
         #endregion
         #region 属性
         /// <summary>
-        /// 歌曲歌词
+        /// 时间
         /// </summary>
-        public Dictionary<double,string> LyricDic
+        public List<double> TimeList
         {
             get
             {
-                return m_LyricDic;
+                return m_TimeList;
             }
         }
+        /// <summary>
+        /// 歌词
+        /// </summary>
+        public List<string> LyricList
+        {
+            get
+            {
+                return m_LyricList;
+            }
+        }
+        
         /// <summary>
         /// 封面
         /// </summary>
@@ -140,12 +155,13 @@ namespace MusicPlayer
             string musicFilePath = MusicPlayerData.MusicFilePath + @"\" + musicFileName + MusicPlayerData.LyrlcFileSuffix;
             if (!File.Exists(musicFilePath))
             {
-                m_LyricDic = new Dictionary<double, string>();
-                m_LyricDic.Add(0, "没有找到歌词");
+                m_TimeList = new List<double>() { 0 };
+                m_LyricList = new List<string>() { "没有找到歌词" };
                 callback?.Invoke();
                 return;
             }
-            m_LyricDic = new Dictionary<double, string>();
+            m_TimeList = new List<double>();
+            m_LyricList = new List<string>();
             WebDownloadTool.WebDownloadText(musicFilePath, (info) =>
             {
                 if (info != null)
@@ -159,15 +175,19 @@ namespace MusicPlayer
                             {
                                 Regex regex = new Regex(@"\[([0-9.:]*)\]+(.*)", RegexOptions.Compiled);
                                 MatchCollection mc = regex.Matches(lrcLine);
-                                double time = TimeSpan.Parse("00:" + mc[0].Groups[1].Value).TotalSeconds;
-                                string word = mc[0].Groups[2].Value;
-                                m_LyricDic.Add(time, word);
+                                string content = mc[0].Groups[2].Value;
+                                if(!string.IsNullOrEmpty(content))
+                                {
+                                    m_TimeList.Add(TimeSpan.Parse("00:" + mc[0].Groups[1].Value).TotalSeconds);
+                                    m_LyricList.Add(content);
+                                }                              
                             }                           
                         }
                     }
-                    if(m_LyricDic.Count==0)
+                    if(m_TimeList.Count==0)
                     {
-                        m_LyricDic.Add(0, "没有歌词");
+                        m_TimeList.Add(0);
+                        m_LyricList.Add("没有歌词");
                     }
                     callback?.Invoke();
                 }
