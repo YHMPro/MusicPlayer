@@ -253,6 +253,7 @@ namespace Farme.Audio
                     m_IsPlay = false;
                     m_As.time = 0;   
                     m_IsStop = true;
+                    m_As.Stop();
                     if (m_AbleRecycle)
                     {
                         if (AudioManager.NotInidleAudioLi.Contains(this))
@@ -265,7 +266,7 @@ namespace Farme.Audio
                             }
                             gameObject.SetActive(false);
                         }
-                    }
+                    }                 
                 });            
             }
         }
@@ -284,7 +285,7 @@ namespace Farme.Audio
         /// 播放
         /// </summary>
         public void Play()
-        {         
+        {
             m_As.Play();
             AppendTimer();
             m_IsPause = false;
@@ -404,17 +405,32 @@ namespace Farme.Audio
         {
             int num = (int)(50 * time);
             float interval = Mathf.Abs(m_As.volume - Mathf.Clamp(volume,0,1)) / num;
+            WaitForSeconds waitForSeconds = new WaitForSeconds(0.02f);
             while (true)
             {            
                 if(num < 0)
                 {
+                    MonoSingletonFactory<ShareMono>.GetSingleton().StopCoroutine(m_ListenVolumeExcess);
                     m_ListenVolumeExcess = null;
                     finishCallback?.Invoke();
                     break;
                 }
                 m_As.volume = Mathf.MoveTowards(m_As.volume, volume, interval);
                 num--;
-                yield return new WaitForSeconds(0.02f);
+                yield return waitForSeconds;
+            }
+        }
+        /// <summary>
+        /// 获取当前播放音频源的频谱数据块 
+        /// </summary>
+        /// <param name="samples">要填充音频样本的数组,它的长度一定是2的幂</param>
+        /// <param name="channel">取样的通道</param>
+        /// <param name="window">采样时使用的fftwwindow类型</param>
+        public void GetSpectrumData(float[] samples, int channel, FFTWindow window)
+        {
+            if (m_As != null)
+            {
+                m_As.GetSpectrumData(samples, channel, window);
             }
         }
         #endregion

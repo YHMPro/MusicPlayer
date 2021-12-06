@@ -26,6 +26,23 @@ namespace MusicPlayer.Manager
         private static Audio m_ButtonAudio = null;
         #endregion
 
+
+        #region 播放状态
+        /// <summary>
+        /// 是否处于播放状态
+        /// </summary>
+        private static bool m_IsPlaying = false;
+        /// <summary>
+        /// 是否处于播放状态
+        /// </summary>
+        public static bool IsPlaying
+        {
+            get
+            {
+                return m_IsPlaying;
+            }
+        }
+        #endregion
         public static void Init()
         {
             if (m_MusicAudioFrom == null)
@@ -60,6 +77,8 @@ namespace MusicPlayer.Manager
                 }
             }
         }
+
+        #region 播放控制
         /// <summary>
         /// 加载并播放(含渐变)
         /// </summary>
@@ -90,6 +109,7 @@ namespace MusicPlayer.Manager
                     m_MusicAudioFrom.Clip = clip;
                     m_MusicAudioFrom.Play();
                 }
+                m_IsPlaying = true;
                 RefreshListPanel();
                 //加载封面与歌词
                 MusicPlayerData.NowPlayMusicInfo = MusicInfoManager.GetMusicInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex]);
@@ -134,11 +154,13 @@ namespace MusicPlayer.Manager
             {
                 if (m_MusicAudioTo.IsPause)
                 {
+                    m_IsPlaying = true;
                     m_MusicAudioTo.Play();
                     MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, LyricLocation);
                 }
                 else
                 {
+                    m_IsPlaying = false;
                     m_MusicAudioTo.Pause();
                     MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);
                 }
@@ -147,11 +169,13 @@ namespace MusicPlayer.Manager
             {
                 if (m_MusicAudioFrom.IsPause)
                 {
+                    m_IsPlaying = true;
                     m_MusicAudioFrom.Play();
                     MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, LyricLocation);
                 }
                 else
                 {
+                    m_IsPlaying = false;
                     m_MusicAudioFrom.Pause();
                     MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);
                 }                    
@@ -175,6 +199,8 @@ namespace MusicPlayer.Manager
             m_AimTime = MusicPlayerData.NowPlayMusicInfo.TimeList[m_LyricIndex];
             m_LyricIndex = 0;//重置
         }
+        #endregion
+        #region 刷新面板
         /// <summary>
         /// 刷新控制面板
         /// </summary>
@@ -214,7 +240,7 @@ namespace MusicPlayer.Manager
             }
 
         }
-
+        #endregion
         #region 歌词实时同步     
         /// <summary>
         /// 目标时间
@@ -225,7 +251,7 @@ namespace MusicPlayer.Manager
         /// </summary>
         private static int m_LyricIndex = 0;
         /// <summary>
-        /// 歌词定位
+        /// 歌词自动定位(在音乐控制面板关闭时自动停止更新,打开时自动开始更新)
         /// </summary>
         public static void LyricLocation()
         {

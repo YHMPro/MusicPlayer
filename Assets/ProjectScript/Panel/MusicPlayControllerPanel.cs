@@ -70,7 +70,6 @@ namespace MusicPlayer.Panel
             m_MusicName.UIEventRegistered(EventTriggerType.PointerEnter, MusicNamePointerEnter);
             m_MusicName.UIEventRegistered(EventTriggerType.PointerExit, MusicNamePointerExit);
             #endregion
-            //m_AlbumRotateTween = m_MusicAlbum.transform.DORotate(new Vector3(0, 0, 360), 6f, RotateMode.WorldAxisAdd).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear);          
         }
 
         protected override void OnDestroy()
@@ -190,14 +189,12 @@ namespace MusicPlayer.Panel
             if (m_SelfEnable)
             {
                 m_SelfAnim.SetTrigger("IsOpen");
-                //封面不为空的情况下
-                MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);
+                MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);              
             }
             else
             {
                 m_SelfAnim.SetTrigger("IsClose");
-                //封面不为空的情况下
-                MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);
+                MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);               
             }
         }
         private void OpenOrCloseUpdate()
@@ -208,13 +205,11 @@ namespace MusicPlayer.Panel
             }
         }
 
-        #region 鼠标光标相关的事件
-
-
+    #region 鼠标光标相关的事件
         #region MusicNamePointer
         private void MusicNamePointerEnter(BaseEventData bEData)
         {
-            MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, MusicNamePointerUpdate);      
+            MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, MusicNamePointerUpdate);
         }
         private void MusicNamePointerExit(BaseEventData bEData)
         {
@@ -227,6 +222,6 @@ namespace MusicPlayer.Panel
 
         }
         #endregion
-        #endregion
+    #endregion
     }
 }

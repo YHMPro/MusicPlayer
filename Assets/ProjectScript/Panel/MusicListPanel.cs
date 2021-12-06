@@ -351,5 +351,60 @@ namespace MusicPlayer.Panel
                 }
             }
         }
+
+        public override void SetState(EnumPanelState state, UnityAction callback = null)
+        {
+            switch (state)
+            {
+                case EnumPanelState.Show:
+                    {
+                        //激活时歌词关闭更新
+                        //只有在歌曲播放状态下才有效
+                        Debuger.LogWarning("歌词后台更新控优化制待");
+                        //if (MusicController.IsPlaying)
+                        //{
+                        //    MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, MusicController.LyricLocation);
+                        //}
+                        gameObject.SetActive(true);
+                        callback?.Invoke();
+                        break;
+                    }
+                case EnumPanelState.Hide:
+                    {
+
+                        //关闭时歌词自动更新
+                        //只有在歌曲播放状态下才有效
+                        Debuger.LogWarning("歌词后台更新控制优化待");
+                        //if (MusicController.IsPlaying)
+                        //{
+                        //    MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, MusicController.LyricLocation);
+                        //}
+                        gameObject.SetActive(false);
+                        callback?.Invoke();                                            
+                        break;
+                    }
+                case EnumPanelState.Destroy:
+                    {
+                        if (relyWindow != null)
+                        {
+                            relyWindow.RemovePanel(gameObject.name);
+                        }
+                        //关闭歌词自动更新
+                        //只有在歌曲播放状态下才有效
+                        if (MusicController.IsPlaying)
+                        {
+                            MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, MusicController.LyricLocation);
+                        }
+                        callback?.Invoke();
+                        Destroy(gameObject);
+                        break;
+                    }
+                case EnumPanelState.None:
+                    {
+                        callback?.Invoke();
+                        break;
+                    }
+            }
+        }
     }
 }

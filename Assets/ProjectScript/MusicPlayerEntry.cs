@@ -10,8 +10,16 @@ namespace MusicPlayer
 {
     public class MusicPlayerEntry : MonoBehaviour
     {
+        private Coroutine m_C;
+
+
         private void Awake()
         {
+            m_C= MonoSingletonFactory<ShareMono>.GetSingleton().DelayAction(0, () => { });
+
+            Debuger.Log(m_C);
+            MonoSingletonFactory<ShareMono>.GetSingleton().StopCoroutine(m_C);
+            Debuger.Log(m_C);
             MusicController.Init();
             //加载控制面板
             if(GoLoad.Take(@"FarmeLockFile\WindowRoot", out GameObject go))
