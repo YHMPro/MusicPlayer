@@ -128,7 +128,17 @@ namespace MusicPlayer.Panel
         /// </summary>
         private void MusicListInit()
         {
-            if(m_MusicList!=null)
+            //重置顶部索引
+            m_MusicTopIndex = 0;
+            #region 重置引用索引
+            m_MusicTopUsingIndex = 0;
+            m_MusicBottomUsingIndex = m_MusicMax - 1;
+            #endregion
+            #region 重置顶部与底部引用
+            m_Top = null;
+            m_Bottom = null;
+            #endregion
+            if (m_MusicList!=null)
             {
                 //获取音乐的数量  从音乐数据类中获取
                 int musicNum = MusicPlayerData.MusicFileNum;
@@ -156,9 +166,7 @@ namespace MusicPlayer.Panel
                         }
                         m_MusicLi.Add(musicUI.rectTransform);
                     }                  
-                }
-                m_MusicTopUsingIndex = 0;
-                m_MusicBottomUsingIndex = m_MusicMax - 1;
+                }             
                 //记录列表此时的世界Y坐标
                 m_MusicLastPosY = m_MusicList.position.y;
             }
@@ -391,10 +399,10 @@ namespace MusicPlayer.Panel
                         }
                         //关闭歌词自动更新
                         //只有在歌曲播放状态下才有效
-                        if (MusicController.IsPlaying)
-                        {
-                            MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, MusicController.LyricLocation);
-                        }
+                        //if (MusicController.IsPlaying)
+                        //{
+                        //    MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, MusicController.LyricLocation);
+                        //}
                         callback?.Invoke();
                         Destroy(gameObject);
                         break;

@@ -194,7 +194,7 @@ namespace MusicPlayer.Panel
             else
             {
                 m_SelfAnim.SetTrigger("IsClose");
-                MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);               
+                BreakOpenOrCloseUpdate();
             }
         }
         private void OpenOrCloseUpdate()
@@ -204,7 +204,10 @@ namespace MusicPlayer.Panel
                 m_MusicAlbum.transform.Rotate(0, 0, 0.05f);
             }
         }
-
+        public void BreakOpenOrCloseUpdate()
+        {
+            MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);
+        }
     #region 鼠标光标相关的事件
         #region MusicNamePointer
         private void MusicNamePointerEnter(BaseEventData bEData)

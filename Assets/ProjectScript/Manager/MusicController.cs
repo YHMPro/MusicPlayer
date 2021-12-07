@@ -54,7 +54,7 @@ namespace MusicPlayer.Manager
                 {
                     m_MusicAudioFrom.Group = group;
                 }
-                
+                m_MusicAudioFrom.Event.FinishEvent += MusicPlayFinishCallback;
             }
             if (m_MusicAudioTo == null)
             {
@@ -65,6 +65,7 @@ namespace MusicPlayer.Manager
                 {
                     m_MusicAudioTo.Group = group;
                 }
+                m_MusicAudioTo.Event.FinishEvent += MusicPlayFinishCallback;
             }
             if (m_ButtonAudio == null)
             {
@@ -301,5 +302,27 @@ namespace MusicPlayer.Manager
         //        }
         //    }
         //}
+
+        #region Event
+        /// <summary>
+        /// 音乐播放完成的事件回调
+        /// </summary>
+        private static void MusicPlayFinishCallback()
+        {
+            if (MonoSingletonFactory<WindowRoot>.SingletonExist)
+            {
+                WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
+                StandardWindow window = root.GetWindow("Controller");
+                if (window != null)
+                {
+                    MusicPlayControllerPanel panel = window.GetPanel<MusicPlayControllerPanel>("ControllerPanel");
+                    if (panel != null)
+                    {
+                        panel.BreakOpenOrCloseUpdate();
+                    }
+                }
+            }
+        }
+        #endregion
     }
 }

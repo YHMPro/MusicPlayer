@@ -4,8 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace MusicPlayer
 {
+    /// <summary>
+    /// 歌词UI
+    /// </summary>
     public class LyricUI : MonoBehaviour
-    {
+    {       
+        /// <summary>
+        /// 文本内容
+        /// </summary>
         private Text m_Lyric = null;
         /// <summary>
         /// 动态索引(代表歌词的实时索引,有可能与歌词进度不同,用于查阅歌词)
@@ -15,7 +21,9 @@ namespace MusicPlayer
         /// 进度索引(与歌曲进度同步)
         /// </summary>
         private int m_ProgressIndex = -1;
-
+        /// <summary>
+        /// 矩形转换
+        /// </summary>
         public RectTransform rectTransform
         {
             get { return transform as RectTransform; }
@@ -46,8 +54,16 @@ namespace MusicPlayer
             m_DynamicIndex = index;
             if (m_Lyric != null)
             {
-                m_Lyric.color = (index == m_ProgressIndex) ? Color.yellow : Color.white;
+                m_Lyric.color = (index == m_ProgressIndex) ? MusicPlayerData.LyricColor : MusicPlayerData.LyricNormalColor;
             }        
+        }
+        /// <summary>
+        /// 歌词重置
+        /// </summary>
+        public void LyricReset()
+        {
+            m_ProgressIndex = -1;
+            m_Lyric.color= MusicPlayerData.LyricNormalColor;
         }
     }
 }

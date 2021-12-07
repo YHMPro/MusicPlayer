@@ -8,6 +8,7 @@ using Farme;
 using Farme.Tool;
 using DG.Tweening;
 using UnityEngine.EventSystems;
+using Farme.Extend;
 namespace MusicPlayer.Panel
 {
     public class MusicLyricPanel : BasePanel
@@ -37,7 +38,7 @@ namespace MusicPlayer.Panel
         /// <summary>
         /// 歌词列表
         /// </summary>
-        private RectTransform m_LyricRoom = null;
+        private Image m_LyricRoom = null;
         /// <summary>
         /// 顶部歌词
         /// </summary>
@@ -54,9 +55,7 @@ namespace MusicPlayer.Panel
         /// 歌词列表下一帧的位置(世界坐标)
         /// </summary>
         private float m_LyricNextPosY = 0;
-
-
-
+      
         protected override void Awake()
         {
             base.Awake();
@@ -64,7 +63,7 @@ namespace MusicPlayer.Panel
             RegisterComponentsTypes<Image>();
             RegisterComponentsTypes<ScrollRect>();
 
-            m_LyricRoom = GetComponent<Image>("LyricRoom").rectTransform;
+            m_LyricRoom = GetComponent<Image>("LyricRoom");
             m_LyricScrollRect = GetComponent<ScrollRect>("LyricScrollView");
             m_LyricBar = GetComponent<Scrollbar>("LyricBar");
         }
@@ -72,7 +71,9 @@ namespace MusicPlayer.Panel
         protected override void Start()
         {
             base.Start();
-            m_LyricScrollRect.onValueChanged.AddListener(LyricScrollRectEvent);        
+            m_LyricScrollRect.onValueChanged.AddListener(LyricScrollRectEvent);
+            m_LyricScrollRect.UIEventRegistered(EventTriggerType.PointerEnter, LyricScrollRectPointerEnter);
+            m_LyricScrollRect.UIEventRegistered(EventTriggerType.PointerExit, LyricScrollRectPointerExit);
             LyricListInit();
         }
 
@@ -95,32 +96,51 @@ namespace MusicPlayer.Panel
         public void LyricListInit()
         {
             Debuger.Log("初始化歌词列表");
+            //重置顶部索引
+            m_TopLyricIndex = 0;
+            #region 重置引用索引
+            m_LyricTopUsingIndex = 0;
+            m_LyricBottomUsingIndex = m_LyricMax - 1;
+            #endregion
+            #region 重置顶部与底部引用
+            m_Top = null;
+            m_Bottom = null;
+            #endregion
             //重置歌词列表为默认位置
-            Vector3 localPos = m_LyricRoom.localPosition;
+            Vector3 localPos = m_LyricRoom.rectTransform.localPosition;
             localPos.y = 0;
-            m_LyricRoom.localPosition = localPos;
+            m_LyricRoom.rectTransform.localPosition = localPos;
             //设置歌词列表长度
             if (MusicPlayerData.NowPlayMusicInfo != null)
             {
                 int lyricNum = MusicPlayerData.NowPlayMusicInfo.LyricList.Count;//歌词数量
                 float fixWitch = 225f;//固定占用
                 float lyricSumWitch = 50f * lyricNum-25f;//歌词总占用
-                Vector2 sizeDelta = m_LyricRoom.sizeDelta;
+                Vector2 sizeDelta = m_LyricRoom.rectTransform.sizeDelta;
                 sizeDelta.y = lyricSumWitch + fixWitch;
-                m_LyricRoom.sizeDelta = sizeDelta;
+                m_LyricRoom.rectTransform.sizeDelta = sizeDelta;
                 if (m_LyricList == null)
                 {
                     m_LyricList = new List<RectTransform>();
                     for (int index = 0; index < m_LyricMax; index++)
                     {
-                        if (GoLoad.Take("UI/Lyric", out GameObject go, m_LyricRoom))
+                        if (GoLoad.Take("UI/Lyric", out GameObject go, m_LyricRoom.rectTransform))
                         {
                             //获取引用
                             LyricUI lyricUI = go.GetComponent<LyricUI>();
+                            //歌词重置
+                            lyricUI.LyricReset();
                             //设置位置信息
                             lyricUI.rectTransform.localPosition = new Vector3(300f, -225 + (index * -50), 0);
-                            //设置信息   通过歌词文件进行获取
-                            lyricUI.SetLyric(MusicPlayerData.NowPlayMusicInfo.LyricList[index], index);
+                            ///设置信息   通过歌词文件进行获取
+                            try
+                            {
+                                lyricUI.SetLyric(MusicPlayerData.NowPlayMusicInfo.LyricList[index], index);
+                            }
+                            catch
+                            {
+                                lyricUI.SetLyric("", -1);
+                            }
                             //添加引用
                             m_LyricList.Add(lyricUI.rectTransform);
                         }
@@ -132,6 +152,8 @@ namespace MusicPlayer.Panel
                     {
                         //获取引用
                         LyricUI lyricUI = m_LyricList[index].GetComponent<LyricUI>();
+                        //歌词重置
+                        lyricUI.LyricReset();
                         //设置位置信息
                         lyricUI.rectTransform.localPosition = new Vector3(300f, -225 + (index * -50), 0);
                         //设置信息   通过歌词文件进行获取
@@ -145,10 +167,8 @@ namespace MusicPlayer.Panel
                         }
                     }
                 }
-            }           
-            m_LyricTopUsingIndex = 0;
-            m_LyricBottomUsingIndex = m_LyricMax - 1;
-            m_LyricLastPosY = m_LyricRoom.position.y;
+            }                     
+            m_LyricLastPosY = m_LyricRoom.rectTransform.position.y;
         }
         /// <summary>
         /// 刷新面板
@@ -159,11 +179,11 @@ namespace MusicPlayer.Panel
             foreach (var lyricTran in m_LyricList)
             {
                 lyricTran.GetComponent<LyricUI>().RefreshLyric(lyricIndex);//刷新当前歌词的颜色
-            }            
-            //if (m_IsLocationLyric)
-            //{               
+            }
+            if (m_IsLocationLyric)
+            {
                 LocationLyric(lyricIndex);//定位当前歌词
-            //}
+            }
         }
         bool m_IsRoll = false;
         /// <summary>
@@ -171,21 +191,11 @@ namespace MusicPlayer.Panel
         /// </summary>
         private void RollEvent()
         {
-            m_LyricNextPosY = m_LyricRoom.position.y;
+            m_LyricNextPosY = m_LyricRoom.rectTransform.position.y;
             float value = m_LyricNextPosY - m_LyricLastPosY;
             if (value == 0)
             {
-                m_IsRoll = false;
-                //延迟3秒,如果没有重置歌词定位那么将自动定位
-                //if (m_LocationLyricCoroutine == null)
-                //{
-                //    m_LocationLyricCoroutine = MonoSingletonFactory<ShareMono>.GetSingleton().DelayAction(3.0f, () =>
-                //    {
-                //        m_IsLocationLyric = true;
-                //        MonoSingletonFactory<ShareMono>.GetSingleton().StopCoroutine(m_LocationLyricCoroutine);
-                //        m_LocationLyricCoroutine = null;
-                //    });
-                //}            
+                m_IsRoll = false;            
                 return;
             }
             LyricIndexRefresh(value > 0 ? BottomLyricRefresh() : TopLyricRefresh());
@@ -196,7 +206,7 @@ namespace MusicPlayer.Panel
         /// </summary>
         /// <param name="pos"></param>
         private void LyricScrollRectEvent(Vector2 pos)
-        {
+        {           
             if (m_LyricList != null)
             {
                 if (m_LyricList.Count < m_LyricMax - 1)//不具备切换歌曲的功能的限制条件
@@ -214,8 +224,7 @@ namespace MusicPlayer.Panel
                 {
                     m_Bottom = m_LyricList[m_LyricBottomUsingIndex];
                 }
-                m_IsRoll = true;              
-                m_IsLocationLyric = false;
+                m_IsRoll = true;
             }
         }
         /// <summary>
@@ -244,7 +253,7 @@ namespace MusicPlayer.Panel
         /// <returns></returns>
         private int TopLyricRefresh()
         {
-            if (m_LyricRoom.localPosition.y >= 225)
+            if (m_LyricRoom.rectTransform.localPosition.y >= 225)
             {
                 //250 
                 if (m_Bottom.position.y <= 250)
@@ -303,11 +312,7 @@ namespace MusicPlayer.Panel
             return isTop ? m_TopLyricIndex : m_TopLyricIndex + m_LyricMax - 1;
         }
 
-        #region 歌词定位
-        /// <summary>
-        /// 定位歌词协程(用于恢复自动定位功能)
-        /// </summary>
-        Coroutine m_LocationLyricCoroutine = null;
+        #region 歌词定位       
         /// <summary>
         /// 是否定位歌词
         /// </summary>
@@ -318,23 +323,19 @@ namespace MusicPlayer.Panel
         /// <param name="index">歌词索引</param>
         private void LocationLyric(int index)
         {
-            Vector3 localPos = m_LyricRoom.localPosition;
+            Vector3 localPos = m_LyricRoom.rectTransform.localPosition;
             localPos.y = index*50f;
-            m_LyricRoom.DOLocalMove(localPos, 0.5f);
+            m_LyricRoom.rectTransform.DOLocalMove(localPos, 1f).SetEase(Ease.Linear);
         }
         #endregion
-        #region LyricScrollRect指针事件
-        private void LyricScrollRectPointerDonw(BaseEventData bEData)//按下
+        #region LyricScrollRect指针事件     
+        private void LyricScrollRectPointerEnter(BaseEventData bEData)//按下
         {
-
-        }
-        private void LyricScrollRectPointerUp(BaseEventData bEData)//抬起
-        {
-
-        }
+            m_IsLocationLyric = false;
+        }     
         private void LyricScrollRectPointerExit(BaseEventData bEData)//离开
         {
-
+            m_IsLocationLyric = true;
         }
         #endregion
     }

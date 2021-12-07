@@ -15,6 +15,34 @@ namespace MusicPlayer
     public class MusicPlayerData 
     {
         /// <summary>
+        /// 歌词正常颜色
+        /// </summary>
+        private static Color m_LyricNormalColor = Color.white;
+        /// <summary>
+        /// 歌词正常颜色
+        /// </summary>
+        public static Color LyricNormalColor
+        {
+            get
+            {
+                return m_LyricNormalColor;
+            }
+        }
+        /// <summary>
+        /// 歌词颜色
+        /// </summary>
+        private static Color m_LyricColor = Color.yellow;
+        /// <summary>
+        /// 歌词颜色
+        /// </summary>
+        public static Color LyricColor
+        {
+            get
+            {
+                return m_LyricColor;
+            }
+        }
+        /// <summary>
         /// 音乐文件后缀
         /// </summary>
         public static string MusicFileSuffix

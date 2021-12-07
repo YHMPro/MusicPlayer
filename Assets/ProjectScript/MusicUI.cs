@@ -27,10 +27,6 @@ namespace MusicPlayer
                return  transform as RectTransform;
             }
         }
-        /// <summary>
-        /// 用于匹配音频文件的密钥
-        /// </summary>
-        //private int m_MusicIndex = -1;
         protected override void Awake()
         {
             base.Awake();
