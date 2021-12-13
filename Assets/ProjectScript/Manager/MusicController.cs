@@ -121,26 +121,8 @@ namespace MusicPlayer.Manager
                         RefreshControllerPanel();
                     });
                     MusicPlayerData.NowPlayMusicInfo.LoadLyriInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex],()=> 
-                    {                     
-                        if (MonoSingletonFactory<WindowRoot>.SingletonExist)
-                        {
-                            WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
-                            StandardWindow window = root.GetWindow("Controller");
-                            if (window != null)
-                            {
-                                MusicLyricPanel panel = window.GetPanel<MusicLyricPanel>("LyricPanel");
-                                if (panel != null)
-                                {
-                                    panel.LyricListInit();//歌词列表初始化
-                                    panel.RefreshPanel(0);//刷新音乐列表面板
-                                    MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);//歌词实时定位
-                                    m_LyricIndex = 0;//重置
-                                    m_AimTime = MusicPlayerData.NowPlayMusicInfo.TimeList[m_LyricIndex];//记录目标时间
-                                    MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, LyricLocation);//歌词实时定位
-                                }
-                            }
-                        }
-                       
+                    {
+                        RefreshLyricPanel();
                     });
                 }
             });                            
@@ -187,6 +169,7 @@ namespace MusicPlayer.Manager
         /// </summary>
         public static void MusicRePlay()
         {
+            Debuger.Log("重新播放");
             if (IsFrom_To)
             {
                 m_MusicAudioTo.RePlay();
@@ -195,8 +178,7 @@ namespace MusicPlayer.Manager
             {
                 m_MusicAudioFrom.RePlay();
             }
-            MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);
-            MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, LyricLocation);
+            RefreshLyricPanel();
             m_AimTime = MusicPlayerData.NowPlayMusicInfo.TimeList[m_LyricIndex];
             m_LyricIndex = 0;//重置
         }
@@ -241,6 +223,30 @@ namespace MusicPlayer.Manager
             }
 
         }
+        /// <summary>
+        /// 刷新歌词面板
+        /// </summary>
+        public static void RefreshLyricPanel()
+        {
+            if (MonoSingletonFactory<WindowRoot>.SingletonExist)
+            {
+                WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
+                StandardWindow window = root.GetWindow("Controller");
+                if (window != null)
+                {
+                    MusicLyricPanel panel = window.GetPanel<MusicLyricPanel>("LyricPanel");
+                    if (panel != null)
+                    {
+                        panel.LyricListInit();//歌词列表初始化
+                        panel.RefreshPanel(0);//刷新音乐列表面板
+                        MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, LyricLocation);//歌词实时定位
+                        m_LyricIndex = 0;//重置
+                        m_AimTime = MusicPlayerData.NowPlayMusicInfo.TimeList[m_LyricIndex];//记录目标时间
+                        MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, LyricLocation);//歌词实时定位
+                    }
+                }
+            }
+        }
         #endregion
         #region 歌词实时同步     
         /// <summary>
@@ -283,44 +289,70 @@ namespace MusicPlayer.Manager
             }                
         }
         #endregion
-        ///// <summary>
-        ///// 刷新歌词面板
-        ///// </summary>
-        //public static void RefreshLyricPanel()
-        //{
-        //    if (MonoSingletonFactory<WindowRoot>.SingletonExist)
-        //    {
-        //        WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
-        //        StandardWindow window = root.GetWindow("Controller");
-        //        if (window != null)
-        //        {
-        //            MusicLyricPanel panel = window.GetPanel<MusicLyricPanel>("LyricPanel");
-        //            if (panel != null)
-        //            {
-        //                panel.RefreshPanel();//刷新音乐列表面板
-        //            }
-        //        }
-        //    }
-        //}
-
+        
         #region Event
         /// <summary>
         /// 音乐播放完成的事件回调
         /// </summary>
         private static void MusicPlayFinishCallback()
         {
-            if (MonoSingletonFactory<WindowRoot>.SingletonExist)
+            MesgManager.MesgTirgger("ListenPlayFinishEvent");          
+        }
+        #endregion
+
+        #region 音量调控
+        /// <summary>
+        /// 主音量调控
+        /// </summary>
+        public static float MainVolume
+        {
+            get
             {
-                WindowRoot root = MonoSingletonFactory<WindowRoot>.GetSingleton();
-                StandardWindow window = root.GetWindow("Controller");
-                if (window != null)
+                if(AudioManager.GetVolume("Master", "MasterVolume",out float value))
                 {
-                    MusicPlayControllerPanel panel = window.GetPanel<MusicPlayControllerPanel>("ControllerPanel");
-                    if (panel != null)
-                    {
-                        panel.BreakOpenOrCloseUpdate();
-                    }
+                    return value;
                 }
+                return 0f;
+            }
+            set
+            {
+                AudioManager.SetVolume("Master", "MasterVolume", value);
+            }
+        }
+        /// <summary>
+        /// 音乐音量调控
+        /// </summary>
+        public static float MusicVolume
+        {
+            get
+            {
+                if (AudioManager.GetVolume("BackGround", "BackGroundVolume", out float value))
+                {
+                    return value;
+                }
+                return 0f;
+            }
+            set
+            {
+                AudioManager.SetVolume("BackGround", "BackGroundVolume", value);
+            }
+        }
+        /// <summary>
+        /// 按钮音量调控
+        /// </summary>
+        public static float ButtonVolume
+        {
+            get
+            {
+                if (AudioManager.GetVolume("Button", "ButtonVolume", out float value))
+                {
+                    return value;
+                }
+                return 0f;
+            }
+            set
+            {
+                AudioManager.SetVolume("Button", "ButtonVolume", value);
             }
         }
         #endregion

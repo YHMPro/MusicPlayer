@@ -5,7 +5,6 @@ using Farme.Tool;
 using System;
 using MusicPlayer.Manager;
 using Farme.Net;
-
 namespace MusicPlayer
 {
     [Serializable]
@@ -196,5 +195,7 @@ namespace MusicPlayer
                 return m_NowPlayMusicIndex < m_MusicFileNum - 1;
             }
         }
+
+       
     }
 }

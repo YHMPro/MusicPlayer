@@ -24,6 +24,7 @@ namespace MusicPlayer.Panel
     /// </summary>
     public class MusicPlayControllerPanel : BasePanel
     {
+        private ENUM_PlayType m_EPT = ENUM_PlayType.SingleLoop;
         private InputField m_MusicName = null;
         private Image m_MusicAlbum = null;
         private Button m_PlayType = null;
@@ -70,6 +71,10 @@ namespace MusicPlayer.Panel
             m_MusicName.UIEventRegistered(EventTriggerType.PointerEnter, MusicNamePointerEnter);
             m_MusicName.UIEventRegistered(EventTriggerType.PointerExit, MusicNamePointerExit);
             #endregion
+
+            #region 注册播放完成事件
+            MesgManager.MesgListen("ListenPlayFinishEvent", ListenPlayFinishEvent);
+            #endregion
         }
 
         protected override void OnDestroy()
@@ -78,18 +83,43 @@ namespace MusicPlayer.Panel
             m_MusicName.UIEventRemove(EventTriggerType.PointerExit, MusicNamePointerExit);
             base.OnDestroy();
         }
-        private void MusicPlayTypeEvent()
-        {
-            Debuger.Log("触发更新播放方式事件");
-
+        private void MusicPlayTypeEvent()//播放类型默认为单曲循环
+        {          
+            switch(m_EPT)
+            {
+                case ENUM_PlayType.SingleLoop:
+                    {
+                        Debuger.Log("触发更新播放方式事件:列表循环");
+                        m_EPT = ENUM_PlayType.ListLoop;
+                        break;
+                    }
+                case ENUM_PlayType.ListLoop:
+                    {
+                        Debuger.Log("触发更新播放方式事件:播放一次");
+                        m_EPT = ENUM_PlayType.One;
+                        break;
+                    }
+                case ENUM_PlayType.One:
+                    {
+                        Debuger.Log("触发更新播放方式事件:单曲循环");
+                        m_EPT = ENUM_PlayType.SingleLoop;
+                        break;
+                    }
+            }
         }
-
         private void MusicPlayOrPauseEvent()
         {
             Debuger.Log("触发播放或暂停事件");
             MusicController.MusicPlayOrPause();
+            if(MusicController.IsPlaying)
+            {
+                MonoSingletonFactory<ShareMono>.GetSingleton().ApplyUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);
+            }
+            else
+            {
+                MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);
+            }
         }
-
         public void RefreshPanel()
         {
             m_Next.interactable = MusicPlayerData.NowPlayMusicIsEnd;
@@ -111,7 +141,6 @@ namespace MusicPlayer.Panel
             ++MusicPlayerData.NowPlayMusicIndex;
             MusicController.MusicPlay();         
         }
-
         private void MusicLastEvent()
         {
             Debuger.Log("触发播放上一首事件");
@@ -119,7 +148,6 @@ namespace MusicPlayer.Panel
             --MusicPlayerData.NowPlayMusicIndex;
             MusicController.MusicPlay();          
         }
-
         private void MusicVolumeEvent()
         {
             Debuger.Log("触发音量调节事件");
@@ -178,7 +206,6 @@ namespace MusicPlayer.Panel
             }
 
         }
-
         /// <summary>
         /// 音乐控制面板是否打开
         /// </summary>
@@ -194,7 +221,7 @@ namespace MusicPlayer.Panel
             else
             {
                 m_SelfAnim.SetTrigger("IsClose");
-                BreakOpenOrCloseUpdate();
+                MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);
             }
         }
         private void OpenOrCloseUpdate()
@@ -203,11 +230,41 @@ namespace MusicPlayer.Panel
             {
                 m_MusicAlbum.transform.Rotate(0, 0, 0.05f);
             }
-        }
-        public void BreakOpenOrCloseUpdate()
+        }     
+        /// <summary>
+        /// 监听播放完成事件(通过消息机制实现)
+        /// </summary>
+        private void ListenPlayFinishEvent()
         {
-            MonoSingletonFactory<ShareMono>.GetSingleton().RemoveUpdateAction(EnumUpdateAction.Standard, OpenOrCloseUpdate);
+            switch(m_EPT)
+            {
+                case ENUM_PlayType.SingleLoop:
+                    {                        
+                        MusicController.MusicRePlay();
+                        break;
+                    }
+                case ENUM_PlayType.ListLoop:
+                    {
+                        if(MusicPlayerData.NowPlayMusicIndex==MusicPlayerData.MusicFileNum-1)//当为最后一首时重置索引为0
+                        {
+                            MusicPlayerData.NowPlayMusicIndex = 0;
+                            MusicController.MusicPlay();
+                        }
+                        else
+                        {
+                            MusicNextEvent();
+                        }                   
+                        break;
+                    }
+                case ENUM_PlayType.One:
+                    {
+
+                        break;
+                    }
+            }
         }
+
+
     #region 鼠标光标相关的事件
         #region MusicNamePointer
         private void MusicNamePointerEnter(BaseEventData bEData)

@@ -10,9 +10,6 @@ namespace MusicPlayer
 {
     public class MusicPlayerEntry : MonoBehaviour
     {
-       
-
-
         private void Awake()
         {
             MusicController.Init();
