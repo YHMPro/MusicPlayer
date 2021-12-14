@@ -4,7 +4,7 @@ using UnityEngine;
 using Farme.Tool;
 using System;
 using MusicPlayer.Manager;
-using Farme.Net;
+using Farme;
 namespace MusicPlayer
 {
     [Serializable]
@@ -13,6 +13,24 @@ namespace MusicPlayer
     /// </summary>
     public class MusicPlayerData 
     {
+        /// <summary>
+        /// 默认封面
+        /// </summary>
+        private static Sprite m_DefaultCover = null;
+        /// <summary>
+        /// 默认封面
+        /// </summary>
+        public static Sprite DefaultCover
+        {
+            get
+            {
+                if (m_DefaultCover == null)
+                {
+                    m_DefaultCover = ResourcesLoad.Load<Sprite>("DefaultCover");
+                }
+                return m_DefaultCover;
+            }
+        }
         /// <summary>
         /// 歌词正常颜色
         /// </summary>

@@ -42,6 +42,64 @@ namespace MusicPlayer.Manager
                 return m_IsPlaying;
             }
         }
+        /// <summary>
+        /// 已播放时长
+        /// </summary>
+        public static float PlayedTime
+        {
+            get
+            {
+                if (IsFrom_To)
+                {
+                    if (m_MusicAudioFrom == null)
+                    {
+                        return 0f;
+                    }
+                    return m_MusicAudioFrom.Time;
+                }
+                if (m_MusicAudioTo == null)
+                {
+                    return 0f;
+                }
+                return m_MusicAudioTo.Time;
+            }
+        }
+        /// <summary>
+        /// 播放进度
+        /// </summary>
+        public static float PlayProgress
+        {
+            get
+            {
+                if (IsFrom_To)
+                {
+                    if (m_MusicAudioTo == null)
+                    {
+                        return 0f;
+                    }
+                    return m_MusicAudioTo.Time / m_PlayTime;
+                }
+                if (m_MusicAudioFrom == null)
+                {
+                    return 0f;
+                }
+                return m_MusicAudioFrom.Time / m_PlayTime;                              
+            }
+        }
+        /// <summary>
+        /// 播放时长(总长度)
+        /// </summary>
+        private static float m_PlayTime = -1f;
+        /// <summary>
+        /// 播放时长(总长度)
+        /// </summary>
+        public static float PlayTime
+        {
+            get
+            {
+                return m_PlayTime;
+            }
+        }
         #endregion
         public static void Init()
         {
@@ -110,6 +168,7 @@ namespace MusicPlayer.Manager
                     m_MusicAudioFrom.Clip = clip;
                     m_MusicAudioFrom.Play();
                 }
+                m_PlayTime = clip.length;
                 m_IsPlaying = true;
                 RefreshListPanel();
                 //加载封面与歌词
@@ -117,7 +176,7 @@ namespace MusicPlayer.Manager
                 if (MusicPlayerData.NowPlayMusicInfo != null)
                 {
                     MusicPlayerData.NowPlayMusicInfo.LoadAlbum(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex],() =>
-                    {
+                    {                     
                         RefreshControllerPanel();
                     });
                     MusicPlayerData.NowPlayMusicInfo.LoadLyriInfo(MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex],()=> 

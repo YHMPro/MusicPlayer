@@ -36,11 +36,13 @@ namespace MusicPlayer.Panel
         private Button m_Set = null;
         private Button m_OpenOrClose = null;
         private Animator m_SelfAnim = null;
+        private Image m_ProgressPoint = null;
+        private Image m_MusicProgress = null;
         protected override void Awake()
         {            
             base.Awake();
             RegisterComponentsTypes<Button>();//注册按钮类型
-            RegisterComponentsTypes<Image>();//注册按钮类型
+            RegisterComponentsTypes<Image>();
             RegisterComponentsTypes<InputField>();
             m_SelfAnim = GetComponent<Animator>();
             m_PlayType = GetComponent<Button>("PlayType");
@@ -61,6 +63,8 @@ namespace MusicPlayer.Panel
             m_OpenOrClose.onClick.AddListener(OpenOrCloseSelf);
             m_MusicAlbum = GetComponent<Image>("MusicAlbum");
             m_MusicName = GetComponent<InputField>("MusicNameInput");
+            m_ProgressPoint = GetComponent<Image>("ProgressPoint");
+            m_MusicProgress = GetComponent<Image>("MusicProgress");
         }
 
         protected override void Start()
@@ -230,6 +234,7 @@ namespace MusicPlayer.Panel
             {
                 m_MusicAlbum.transform.Rotate(0, 0, 0.05f);
             }
+            ProgressPointUpdate();
         }     
         /// <summary>
         /// 监听播放完成事件(通过消息机制实现)
@@ -282,6 +287,19 @@ namespace MusicPlayer.Panel
 
         }
         #endregion
+
+        #endregion
+
+    #region ProgressPoint更新
+    private Vector3 m_ProgressEuler = Vector3.forward;//进度点旋转量
+    private void ProgressPointUpdate()
+    {
+        //调整进度填充系数
+        m_MusicProgress.fillAmount = MusicController.PlayProgress;
+        m_ProgressEuler.z = -360f * m_MusicProgress.fillAmount;
+        //进度点控制
+        m_ProgressPoint.rectTransform.localEulerAngles = m_ProgressEuler;
+    }
     #endregion
     }
 }

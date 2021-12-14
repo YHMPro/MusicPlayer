@@ -70,6 +70,10 @@ namespace MusicPlayer
         {
             get
             {
+                if (m_Sp == null)
+                {
+                    return MusicPlayerData.DefaultCover;
+                }
                 return m_Sp;
             }
         }
@@ -215,7 +219,10 @@ namespace MusicPlayer
             {
                 m_Sp = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), Vector2.zero);
                 callback?.Invoke();
+                return;
             });
+            m_Sp = MusicPlayerData.DefaultCover;
+            callback?.Invoke();
         }
         /// <summary>
         /// 从文件路径中提取基础信息
