@@ -28,7 +28,13 @@ namespace MusicPlayer
                         Debuger.Log("加载歌词面板成功");
                     });
                 });                
-            }                  
+            }
+            if (ResourcesLoad.Load<Material>("SkyBox/Purple_4K_Resolution",out Material material))
+            {
+                RenderSettings.skybox = material;
+            }
+            //设置天空盒
+           
         }
         public void Update()
         {

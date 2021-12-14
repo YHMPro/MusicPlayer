@@ -96,6 +96,8 @@
     <Compile Include="Assets\ProjectScript\Panel\MusicPlayControllerPanel.cs" />
     <Compile Include="Assets\ProjectScript\Panel\MusicPlayInterfacePanel.cs" />
     <Compile Include="Assets\ProjectScript\Panel\MusicPlaySetPanel.cs" />
+    <Compile Include="Assets\SpaceSkies Free\Demo\Scripts\LookCamera.cs" />
+    <Compile Include="Assets\SpaceSkies Free\Demo\Scripts\SkyboxChanger.cs" />
     <Compile Include="Assets\Test.cs" />
     <Compile Include="Assets\WindowAPI.cs" />
   </ItemGroup>

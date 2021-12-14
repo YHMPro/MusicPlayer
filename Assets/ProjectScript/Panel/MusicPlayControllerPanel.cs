@@ -8,6 +8,7 @@ using Farme.Tool;
 using MusicPlayer.Manager;
 using UnityEngine.EventSystems;
 using Farme.Extend;
+using DG.Tweening;
 namespace MusicPlayer.Panel
 {
     /// <summary>
@@ -38,12 +39,17 @@ namespace MusicPlayer.Panel
         private Animator m_SelfAnim = null;
         private Image m_ProgressPoint = null;
         private Image m_MusicProgress = null;
+
+        private Text m_NowTime = null;
+        private Text m_AimTime = null;
         protected override void Awake()
         {            
             base.Awake();
-            RegisterComponentsTypes<Button>();//注册按钮类型
+            //注册类型
+            RegisterComponentsTypes<Button>();
             RegisterComponentsTypes<Image>();
             RegisterComponentsTypes<InputField>();
+            RegisterComponentsTypes<Text>();
             m_SelfAnim = GetComponent<Animator>();
             m_PlayType = GetComponent<Button>("PlayType");
             m_PlayType.onClick.AddListener(MusicPlayTypeEvent);
@@ -65,17 +71,24 @@ namespace MusicPlayer.Panel
             m_MusicName = GetComponent<InputField>("MusicNameInput");
             m_ProgressPoint = GetComponent<Image>("ProgressPoint");
             m_MusicProgress = GetComponent<Image>("MusicProgress");
+            m_NowTime = GetComponent<Text>("NowTime");
+            m_AimTime = GetComponent<Text>("AimTime");
         }
 
         protected override void Start()
         {
             base.Start();
-
+            m_NowTime.gameObject.SetActive(false);
+            m_AimTime.gameObject.SetActive(false);
             #region 注册m_MusicName上的指针进入移出事件
             m_MusicName.UIEventRegistered(EventTriggerType.PointerEnter, MusicNamePointerEnter);
             m_MusicName.UIEventRegistered(EventTriggerType.PointerExit, MusicNamePointerExit);
             #endregion
 
+            #region 注册m_MusicAlbum上的指针进入移出事件
+            m_MusicAlbum.UIEventRegistered(EventTriggerType.PointerEnter,MusicAlbumPointerEnter);
+            m_MusicAlbum.UIEventRegistered(EventTriggerType.PointerExit, MusicAlbumPointerExit);
+            #endregion
             #region 注册播放完成事件
             MesgManager.MesgListen("ListenPlayFinishEvent", ListenPlayFinishEvent);
             #endregion
@@ -85,6 +98,9 @@ namespace MusicPlayer.Panel
         {
             m_MusicName.UIEventRemove(EventTriggerType.PointerEnter, MusicNamePointerEnter);
             m_MusicName.UIEventRemove(EventTriggerType.PointerExit, MusicNamePointerExit);
+            m_MusicAlbum.UIEventRemove(EventTriggerType.PointerEnter, MusicAlbumPointerEnter);
+            m_MusicAlbum.UIEventRemove(EventTriggerType.PointerExit, MusicAlbumPointerExit);
+            MesgManager.MesgBreakListen("ListenPlayFinishEvent", ListenPlayFinishEvent);
             base.OnDestroy();
         }
         private void MusicPlayTypeEvent()//播放类型默认为单曲循环
@@ -137,6 +153,7 @@ namespace MusicPlayer.Panel
                 Debuger.Log("更新歌曲封面");
             }
             m_MusicName.text = MusicPlayerData.MusicFileNames[MusicPlayerData.NowPlayMusicIndex];//更新音乐文件名称
+            m_AimTime.text = MusicPlayerTool.SecondTimeToStandardTime(MusicController.PlayTime);//设置总时长
         }
         private void MusicNextEvent()
         {
@@ -287,8 +304,21 @@ namespace MusicPlayer.Panel
 
         }
         #endregion
-
+        #region MusicAlbumPointer
+        private void MusicAlbumPointerEnter(BaseEventData bEData)
+        {
+            m_MusicAlbum.DOColor(new Color32(150, 150, 150, 255), 0.5f);
+            m_NowTime.gameObject.SetActive(true);
+            m_AimTime.gameObject.SetActive(true);
+        }
+        private void MusicAlbumPointerExit(BaseEventData bEData)
+        {
+            m_MusicAlbum.DOColor(Color.white, 0.5f);
+            m_NowTime.gameObject.SetActive(false);
+            m_AimTime.gameObject.SetActive(false);
+        }
         #endregion
+    #endregion
 
     #region ProgressPoint更新
     private Vector3 m_ProgressEuler = Vector3.forward;//进度点旋转量
@@ -299,6 +329,8 @@ namespace MusicPlayer.Panel
         m_ProgressEuler.z = -360f * m_MusicProgress.fillAmount;
         //进度点控制
         m_ProgressPoint.rectTransform.localEulerAngles = m_ProgressEuler;
+            Debuger.Log(MusicController.PlayedTime);
+        m_NowTime.text = MusicPlayerTool.SecondTimeToStandardTime(MusicController.PlayedTime);
     }
     #endregion
     }

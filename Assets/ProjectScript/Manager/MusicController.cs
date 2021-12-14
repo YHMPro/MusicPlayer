@@ -51,17 +51,17 @@ namespace MusicPlayer.Manager
             {
                 if (IsFrom_To)
                 {
-                    if (m_MusicAudioFrom == null)
+                    if (m_MusicAudioTo == null)
                     {
                         return 0f;
                     }
-                    return m_MusicAudioFrom.Time;
-                }
-                if (m_MusicAudioTo == null)
+                    return m_MusicAudioTo.Time;
+                }              
+                if (m_MusicAudioFrom == null)
                 {
                     return 0f;
                 }
-                return m_MusicAudioTo.Time;
+                return m_MusicAudioFrom.Time;
             }
         }
         /// <summary>

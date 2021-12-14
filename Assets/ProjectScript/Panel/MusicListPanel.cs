@@ -7,6 +7,8 @@ using Farme.UI;
 using Farme.Tool;
 using UnityEngine.Events;
 using MusicPlayer.Manager;
+using DG.Tweening;
+
 namespace MusicPlayer.Panel
 {
     /// <summary>
@@ -64,19 +66,26 @@ namespace MusicPlayer.Panel
         /// 底部
         /// </summary>
         private RectTransform m_Bottom;
+        /// <summary>
+        /// 歌曲定位按钮
+        /// </summary>
+        private Button m_MusicLocation = null;
         protected override void Awake()
         {
             base.Awake();
             RegisterComponentsTypes<Image>();
             RegisterComponentsTypes<ScrollRect>();
             RegisterComponentsTypes<Scrollbar>();
+            RegisterComponentsTypes<Button>();
         }
 
 
         protected override void Start()
         {
             base.Start();
-            if(GetComponent("MusicScrollRect",out m_SR))
+            m_MusicLocation = GetComponent<Button>("MusicLocation");
+            m_MusicLocation.onClick.AddListener(LocationMusic);
+            if (GetComponent("MusicScrollRect",out m_SR))
             {
                 m_SR.onValueChanged.AddListener(ScrollRectEvent);
             }
@@ -359,7 +368,17 @@ namespace MusicPlayer.Panel
                 }
             }
         }
-
+        #region 歌曲定位
+        /// <summary>
+        /// 歌曲定位
+        /// </summary>
+        private void LocationMusic()
+        {
+            Vector3 localPos = m_MusicList.localPosition;
+            localPos.y =MusicPlayerData.NowPlayMusicIndex * 120f;
+            m_MusicList.DOLocalMove(localPos, 1f).SetEase(Ease.Linear);
+        }
+        #endregion
         public override void SetState(EnumPanelState state, UnityAction callback = null)
         {
             switch (state)

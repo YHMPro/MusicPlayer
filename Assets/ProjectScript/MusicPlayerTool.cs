@@ -66,6 +66,7 @@ namespace MusicPlayer
         public static void GetAlbumCover(string path, UnityAction<Texture2D> resultCallback)
         {
             FileStream fs = new FileStream(path, FileMode.Open);
+            Texture2D texture2D = null;
             try
             {
                 byte[] header = new byte[10]; //标签头
@@ -97,6 +98,7 @@ namespace MusicPlayer
                         offset += size + 10;
                         head = Encoding.Default.GetString(body, size, 4);
                     }
+                    
                     if (haveAPIC)
                     {
                         size = body[size + 4] * 0x1000000
@@ -184,10 +186,9 @@ namespace MusicPlayer
                         }
                         byte[] imageBytes = new byte[size];
                         fs.Read(imageBytes, 0, size);
-                        Texture2D texture2D = new Texture2D(128, 128);
-                        texture2D.LoadImage(imageBytes);
-                        resultCallback?.Invoke(texture2D);
-                    }
+                        texture2D = new Texture2D(128, 128);
+                        texture2D.LoadImage(imageBytes);                   
+                    }                
                 }
 
             }
@@ -199,6 +200,7 @@ namespace MusicPlayer
             {
                 fs.Close();
             }
+            resultCallback?.Invoke(texture2D);
         }
         /// <summary>
         /// 去除字符串中的空字符
@@ -217,6 +219,18 @@ namespace MusicPlayer
         public static bool MatchWord(string content)
         {
             return Regex.IsMatch(content, "[0-9][0-9]:[0-9][0-9].[0-9][0-9]");
+        }
+        /// <summary>
+        /// 以秒为单位的时间转换为标准时间(00:00)的格式
+        /// </summary>
+        /// <param name="second"></param>
+        /// <returns></returns>
+        public static string SecondTimeToStandardTime(float time)
+        {
+            int minute = (int)(time / 60);
+            int second = (int)time % 60; 
+            return minute >= 10 ? minute.ToString() : ("0" + minute)//分
+                + ":" + (second >= 10 ? (second).ToString() : ("0" + second));
         }
     }
 }
