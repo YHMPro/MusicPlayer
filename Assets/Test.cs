@@ -5,18 +5,21 @@ using System.IO;
 using MusicPlayer;
 using Farme.Net;
 using Farme.Audio;
+using MusicPlayer.Visual;
 public class Test : MonoBehaviour
 {
-    public Transform img;
-
-    private Vector3 m_SelfToImgDir;
-    private float Dis = 5;
-    float m_y;
+    //public Transform img;
+    public bool enable=false;
+    //private Vector3 m_SelfToImgDir;
+    //private float Dis = 5;
+    //float m_y;
     // Start is called before the first frame update
     void Start()
     {
-        m_y = transform.position.y - img.position.y;
-        m_SelfToImgDir=(img.position - transform.position).normalized;
+        //VisualStyle.BuilderLine();
+        //VisualStyle.BuilderCircle();
+        //m_y = transform.position.y - img.position.y;
+        //m_SelfToImgDir=(img.position - transform.position).normalized;
         // m_SelfToImgDir = img.position - transform.position;
         //Dis = m_SelfToImgDir.magnitude;
         //string path = "C:\\Users\\XiaoHeTao\\Desktop\\Music\\";
@@ -68,7 +71,7 @@ public class Test : MonoBehaviour
         //    Debug.Log(value);
         //}
 
-
+        VisualStyle.BuilderLine();
 
     }
     //private int[] array_ = new int[] { 5, 2, 8, 4, 9, 1 };
@@ -92,25 +95,37 @@ public class Test : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            VisualStyle.BuilderLine();
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            VisualStyle.BuilderCircle();
+        }
+        if (enable)
+        {
+            VisualTool.SampleAllot();
+        }
         //Vector3 selfToImgDir = (img.position - transform.position).normalized;
 
-        Vector3 pos= transform.position + m_SelfToImgDir * Dis;
+        //Vector3 pos= transform.position + m_SelfToImgDir * Dis;
 
-        pos.y = m_y;
-        float angle = Vector3.SignedAngle(Vector3.forward, transform.forward,transform.up);
+        //pos.y = m_y;
+        //float angle = Vector3.SignedAngle(Vector3.forward, transform.forward,transform.up);
 
-        pos.x = -Mathf.Cos(angle * Mathf.PI / 180f);
-        pos.z = Mathf.Sin(angle * Mathf.PI / 180f);
-
-
-        Vector3 r = img.eulerAngles;
-        r.y = -90+transform.eulerAngles.y;
-        img.eulerAngles = r;
+        //pos.x = -Mathf.Cos(angle * Mathf.PI / 180f);
+        //pos.z = Mathf.Sin(angle * Mathf.PI / 180f);
 
 
+        //Vector3 r = img.eulerAngles;
+        //r.y = -90+transform.eulerAngles.y;
+        //img.eulerAngles = r;
 
 
-        img.position =transform.position+ pos.normalized*Dis;
+
+
+        //img.position =transform.position+ pos.normalized*Dis;
 
         //img.LookAt(transform);
 

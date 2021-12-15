@@ -329,7 +329,6 @@ namespace MusicPlayer.Panel
         m_ProgressEuler.z = -360f * m_MusicProgress.fillAmount;
         //进度点控制
         m_ProgressPoint.rectTransform.localEulerAngles = m_ProgressEuler;
-            Debuger.Log(MusicController.PlayedTime);
         m_NowTime.text = MusicPlayerTool.SecondTimeToStandardTime(MusicController.PlayedTime);
     }
     #endregion

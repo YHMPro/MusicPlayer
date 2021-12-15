@@ -80,6 +80,9 @@
     <Compile Include="Assets\Frame\UI\StandardWindow.cs" />
     <Compile Include="Assets\Frame\UI\WindowRoot.cs" />
     <Compile Include="Assets\LrcInfo.cs" />
+    <Compile Include="Assets\ProjectScript\AudioVisual\VisualRectangle.cs" />
+    <Compile Include="Assets\ProjectScript\AudioVisual\VisualStyle.cs" />
+    <Compile Include="Assets\ProjectScript\AudioVisual\VisualTool.cs" />
     <Compile Include="Assets\ProjectScript\LyricUI.cs" />
     <Compile Include="Assets\ProjectScript\Manager\MusicController.cs" />
     <Compile Include="Assets\ProjectScript\Manager\MusicDataManager.cs" />
@@ -96,6 +99,14 @@
     <Compile Include="Assets\ProjectScript\Panel\MusicPlayControllerPanel.cs" />
     <Compile Include="Assets\ProjectScript\Panel\MusicPlayInterfacePanel.cs" />
     <Compile Include="Assets\ProjectScript\Panel\MusicPlaySetPanel.cs" />
+    <Compile Include="Assets\SWS\Scripts\Helper\MoveAnimator.cs" />
+    <Compile Include="Assets\SWS\Scripts\Helper\PathIndicator.cs" />
+    <Compile Include="Assets\SWS\Scripts\Helper\PathRenderer.cs" />
+    <Compile Include="Assets\SWS\Scripts\Manager\BezierPathManager.cs" />
+    <Compile Include="Assets\SWS\Scripts\Manager\PathManager.cs" />
+    <Compile Include="Assets\SWS\Scripts\Manager\WaypointManager.cs" />
+    <Compile Include="Assets\SWS\Scripts\Movement\navMove.cs" />
+    <Compile Include="Assets\SWS\Scripts\Movement\splineMove.cs" />
     <Compile Include="Assets\SpaceSkies Free\Demo\Scripts\LookCamera.cs" />
     <Compile Include="Assets\SpaceSkies Free\Demo\Scripts\SkyboxChanger.cs" />
     <Compile Include="Assets\Test.cs" />
@@ -103,7 +114,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Frame\Plugins\Audio\NAudio.dll" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween43.xml" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween50.xml" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween46.dll" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween.XML" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween50.dll" />
+    <None Include="Assets\SWS\Extensions\DOTween\readme.txt" />
     <None Include="Assets\Frame\Plugins\Log\Debuger.dll" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween.dll" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween43.dll" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween46.xml" />
     <None Include="Assets\Frame\Plugins\Log\Debuger.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -297,7 +317,16 @@
       <HintPath>Assets\Frame\Plugins\Log\Debuger.dll</HintPath>
     </Reference>
     <Reference Include="DOTween">
-      <HintPath>Assets\Plugins\Demigiant\DOTween\DOTween.dll</HintPath>
+      <HintPath>Assets\SWS\Extensions\DOTween\DOTween.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween46">
+      <HintPath>Assets\SWS\Extensions\DOTween\DOTween46.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween43">
+      <HintPath>Assets\SWS\Extensions\DOTween\DOTween43.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween50">
+      <HintPath>Assets\SWS\Extensions\DOTween\DOTween50.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:\Program Files\Unity\2019.4.33f1\Editor\Data\NetStandard\ref\2.0.0\netstandard.dll</HintPath>
@@ -676,10 +705,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{52EC033A-5D66-3199-D7D0-51183D13B023}</Project>
-      <Name>Assembly-CSharp-firstpass</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

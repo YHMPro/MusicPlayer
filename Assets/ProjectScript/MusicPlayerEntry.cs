@@ -29,7 +29,7 @@ namespace MusicPlayer
                     });
                 });                
             }
-            if (ResourcesLoad.Load<Material>("SkyBox/Purple_4K_Resolution",out Material material))
+            if (ResourcesLoad.Load("SkyBox/Purple_4K_Resolution",out Material material))
             {
                 RenderSettings.skybox = material;
             }

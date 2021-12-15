@@ -25,7 +25,38 @@ namespace MusicPlayer.Manager
         #region 按键音效(仅在音乐没有正在播放的情况下才有效)
         private static Audio m_ButtonAudio = null;
         #endregion
-
+        /// <summary>
+        /// 采集样本长度
+        /// </summary>
+        public static readonly int SampleLength = 512;// 为64组 连续的4段数据块 建立可视化图像
+        /// <summary>
+        /// 音乐采集样本
+        /// </summary>
+        private static float[] m_MusicSample=new float[SampleLength];
+        /// <summary>
+        /// 音乐采集样本
+        /// </summary>
+        public static float[] MusicSample
+        {
+            get
+            {
+                if (IsFrom_To)
+                {
+                    if (m_MusicAudioTo == null)
+                    {
+                        return null;
+                    }
+                    m_MusicAudioTo.GetSpectrumData(m_MusicSample, 0, FFTWindow.Triangle);
+                    return m_MusicSample;
+                }
+                if (m_MusicAudioFrom == null)
+                {
+                    return null;
+                }
+                m_MusicAudioFrom.GetSpectrumData(m_MusicSample, 0, FFTWindow.Triangle);
+                return m_MusicSample;
+            }
+        }
 
         #region 播放状态
         /// <summary>

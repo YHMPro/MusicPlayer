@@ -48,7 +48,7 @@ namespace MusicPlayer
             MP3path = URLInput.text;
             //Lrcpath=
         }
-        Audio audio;
+        //Audio audio;
         string path = "C:\\Users\\XiaoHeTao\\Desktop\\Music\\";
         public void PlayEvent()
         {
@@ -161,18 +161,18 @@ namespace MusicPlayer
 
         public void Con()
         {
-            if(audio!=null)
-            {
-                //audio.GetSpectrumData(samples, 0, FFTWindow.BlackmanHarris);
-                //float num = 0;
-                //foreach(var value in samples)
-                //{
-                //    num += value;
-                //}
-                //img1.localScale = Vector3.one * num*10;
-                //img2.localScale = Vector3.one * num*10;
+            //if(audio!=null)
+            //{
+            //    //audio.GetSpectrumData(samples, 0, FFTWindow.BlackmanHarris);
+            //    //float num = 0;
+            //    //foreach(var value in samples)
+            //    //{
+            //    //    num += value;
+            //    //}
+            //    //img1.localScale = Vector3.one * num*10;
+            //    //img2.localScale = Vector3.one * num*10;
 
-            }
+            //}
         }
 
         public void Update()
