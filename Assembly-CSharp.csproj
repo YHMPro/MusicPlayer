@@ -110,6 +110,7 @@
     <Compile Include="Assets\SpaceSkies Free\Demo\Scripts\LookCamera.cs" />
     <Compile Include="Assets\SpaceSkies Free\Demo\Scripts\SkyboxChanger.cs" />
     <Compile Include="Assets\Test.cs" />
+    <Compile Include="Assets\Test2.cs" />
     <Compile Include="Assets\WindowAPI.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -319,11 +320,11 @@
     <Reference Include="DOTween">
       <HintPath>Assets\SWS\Extensions\DOTween\DOTween.dll</HintPath>
     </Reference>
-    <Reference Include="DOTween46">
-      <HintPath>Assets\SWS\Extensions\DOTween\DOTween46.dll</HintPath>
-    </Reference>
     <Reference Include="DOTween43">
       <HintPath>Assets\SWS\Extensions\DOTween\DOTween43.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween46">
+      <HintPath>Assets\SWS\Extensions\DOTween\DOTween46.dll</HintPath>
     </Reference>
     <Reference Include="DOTween50">
       <HintPath>Assets\SWS\Extensions\DOTween\DOTween50.dll</HintPath>

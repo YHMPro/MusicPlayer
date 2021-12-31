@@ -17,7 +17,7 @@ namespace MusicPlayer.Visual
                     scale.x += MusicController.MusicSample[i];
                     i++;
                 }
-                scale.x *= 15f;
+                scale.x *= 30f;
                 if (VisualStyle.VisualRectangleLi.Count > k)
                 {
                     VisualStyle.VisualRectangleLi[k].Scale = scale;

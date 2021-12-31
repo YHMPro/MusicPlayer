@@ -8,8 +8,10 @@ using Farme.Audio;
 using MusicPlayer.Visual;
 public class Test : MonoBehaviour
 {
+    private Vector3 m_Origin = Vector3.zero;
+    private Vector3[] m_CirclePos;
     //public Transform img;
-    public bool enable=false;
+    //public bool enable=false;
     //private Vector3 m_SelfToImgDir;
     //private float Dis = 5;
     //float m_y;
@@ -71,7 +73,7 @@ public class Test : MonoBehaviour
         //    Debug.Log(value);
         //}
 
-        VisualStyle.BuilderLine();
+        //VisualStyle.BuilderLine();
 
     }
     //private int[] array_ = new int[] { 5, 2, 8, 4, 9, 1 };
@@ -95,18 +97,18 @@ public class Test : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.L))
-        {
-            VisualStyle.BuilderLine();
-        }
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            VisualStyle.BuilderCircle();
-        }
-        if (enable)
-        {
-            VisualTool.SampleAllot();
-        }
+        //if(Input.GetKeyDown(KeyCode.L))
+        //{
+        //    VisualStyle.BuilderLine();
+        //}
+        //if (Input.GetKeyDown(KeyCode.C))
+        //{
+        //    VisualStyle.BuilderCircle();
+        //}
+        //if (enable)
+        //{
+        //    VisualTool.SampleAllot();
+        //}
         //Vector3 selfToImgDir = (img.position - transform.position).normalized;
 
         //Vector3 pos= transform.position + m_SelfToImgDir * Dis;
