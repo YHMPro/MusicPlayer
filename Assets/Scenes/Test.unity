@@ -175,7 +175,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 90
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -219,6 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce8610cb2fd89e4d879128488f51406, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ScaleCircle: 0
   MiddleCircleRadius: 0
   MiddleCircleWide: 0
   Scale: 10
@@ -709,6 +710,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce8610cb2fd89e4d879128488f51406, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ScaleCircle: 0
   MiddleCircleRadius: 0
   MiddleCircleWide: 0
   Scale: 10
@@ -1086,7 +1088,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1180,11 +1182,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce8610cb2fd89e4d879128488f51406, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MiddleCircleRadius: 1
-  MiddleCircleWide: 0.3
-  Scale: 10
-  Wide: 0.01
-  Radius: 1
+  ScaleCircle: 0.005
+  MiddleCircleRadius: 0.3
+  MiddleCircleWide: -7.19
+  Scale: 80
+  Wide: 0.1
+  Radius: 24.32
   m_Origin: {x: 0, y: 0, z: 0}
   m_OutLR: {fileID: 249381877}
   m_InLR: {fileID: 593892601}
